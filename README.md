@@ -39,6 +39,7 @@ That’s where gaps hide.
 ---
 
 ## 60-second start
+1. Open your terminal
 
 ```bash
 npx degit sherizan/superdesigner-ai my-superdesigner
@@ -47,22 +48,36 @@ npm install
 cursor .
 ```
 
+2. Open Cursor's built-in terminal
+
 ```bash
-npm run new "My Project"
+npm run new -- "My Project"
+```
+
+It will create the necessary files.
+
+3. Add your Figma design to figma.md.
+
+4. Add your documents
+
+Drop raw files into `/raw`:
+- PRDs (DOCS / PDF)
+- Research decks (PPTX / PDF)
+- Notes (MD / TXT)
+
+Run:
+```bash
 npm run convert -- my-project
-npm run review -- my-project
-npm run comments - 
 ```
 
-Open the generated `_superdesigner_*_prompt.md` files and run them with **Cursor Agent**.
-
-Then post comments to Figma:
-
-```bash
-npm run comment -- my-project
-```
+Superdesigner normalizes them for review.
 
 ---
+
+5. Run the design review
+```bash
+npm run review -- my-project
+```
 
 ## What you get
 
@@ -78,21 +93,15 @@ npm run comment -- my-project
   - Calm, specific, actionable
   - Preview locally, then post to Figma with `npm run comment`
 
----
+6. Open the generated `_superdesigner_*_prompt.md` files and run them with **Cursor Agent**. Just type @ to mention the file and hit enter
 
-## Works with real inputs
+Then post comments to Figma automatically:
 
-Drop raw files into `/raw`:
-- PRDs (DOCS / PDF)
-- Research decks (PPTX / PDF)
-- Notes (MD / TXT)
-
-Run:
 ```bash
-npm run convert -- my-project
+npm run comment -- my-project
 ```
 
-Superdesigner normalizes them for review.
+And you're done!
 
 ---
 
