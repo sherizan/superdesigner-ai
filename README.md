@@ -38,6 +38,14 @@ That’s where gaps hide.
 
 ---
 
+## Requirements
+
+- Node.js 18+
+- **Cursor**
+- **Figma MCP** — [Add to Cursor](https://cursor.directory/mcp/figma)
+
+---
+
 ## 60-second start
 1. Open your terminal
 
@@ -102,14 +110,6 @@ npm run comment -- my-project
 ```
 
 And you're done!
-
----
-
-## Requirements
-
-- Node.js 18+
-- **Cursor (recommended)**
-- **Figma MCP (recommended)**
 
 ---
 
