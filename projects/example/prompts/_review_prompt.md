@@ -2,12 +2,23 @@
 
 Read `_review_context.md` in this folder and generate the design review documents.
 
+## Step 1: Fetch Figma Design Context (if available)
+
+If the context file contains a Figma URL with fileKey and nodeId:
+
+1. Use `mcp_Figma_get_design_context` to fetch the actual design structure
+2. Compare the Figma frames against the PRD happy path
+3. Note any missing screens or states in your review
+
+This gives you real design data to validate against the PRD.
+
 ## Rules (STRICT)
 
-1. **Do NOT invent requirements** — only use what's in the context file
+1. **Do NOT invent requirements** — only use what's in the context file + Figma MCP data
 2. **Be specific** — reference actual steps, screens, and edge cases from the PRD
-3. **Be actionable** — every suggestion should be something the designer can do
-4. **Use the templates exactly** — follow the structure provided below
+3. **Cross-reference Figma** — if you fetched design context, compare it to the PRD flow
+4. **Be actionable** — every suggestion should be something the designer can do
+5. **Use the templates exactly** — follow the structure provided below
 
 ## Output (EXACTLY two files)
 

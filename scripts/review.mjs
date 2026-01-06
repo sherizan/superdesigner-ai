@@ -12,6 +12,24 @@ import { readFile, writeFile, listProjectDirs, getProjectPath, projectExists } f
 import { extractHeadings, extractBullets, extractSection, extractNodeId } from '../lib/generator.mjs';
 
 /**
+ * Extract Figma file key from figma.md content.
+ */
+function extractFileKey(content) {
+  if (!content) return null;
+  const match = content.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Extract Figma URL from figma.md content.
+ */
+function extractFigmaUrl(content) {
+  if (!content) return null;
+  const match = content.match(/(https:\/\/www\.figma\.com\/(?:file|design)\/[^\s\n]+)/);
+  return match ? match[1] : null;
+}
+
+/**
  * Design Review template - exact structure for Cursor Agent.
  */
 const DESIGN_REVIEW_TEMPLATE = `# Design Review: <Project Name>
@@ -133,6 +151,8 @@ function generateContext(artifacts, projectName, slug) {
   const problem = extractSection(prd, 'problem');
   const headings = extractHeadings(prd);
   const nodeId = extractNodeId(figma);
+  const fileKey = extractFileKey(figma);
+  const figmaUrl = extractFigmaUrl(figma);
   
   const date = new Date().toISOString();
   
@@ -167,8 +187,22 @@ ${headings.map(h => `- ${h}`).join('\n')}
 
 ## Extracted from Figma
 
+### Figma URL
+${figmaUrl || '*No Figma URL found in figma.md*'}
+
+### File Key
+${fileKey || '*No file key found*'}
+
 ### Node ID (for comment pinning)
 ${nodeId || '*No node-id found in figma.md URL*'}
+
+### Figma MCP Instructions
+If Figma URL is available above, use Figma MCP to fetch design context:
+\`\`\`
+mcp_Figma_get_design_context with:
+  fileKey: "${fileKey || '<FILE_KEY>'}"
+  nodeId: "${nodeId || '<NODE_ID>'}"
+\`\`\`
 
 ---
 
@@ -194,12 +228,23 @@ function generatePrompt(projectName, slug) {
 
 Read \`_review_context.md\` in this folder and generate the design review documents.
 
+## Step 1: Fetch Figma Design Context (if available)
+
+If the context file contains a Figma URL with fileKey and nodeId:
+
+1. Use \`mcp_Figma_get_design_context\` to fetch the actual design structure
+2. Compare the Figma frames against the PRD happy path
+3. Note any missing screens or states in your review
+
+This gives you real design data to validate against the PRD.
+
 ## Rules (STRICT)
 
-1. **Do NOT invent requirements** — only use what's in the context file
+1. **Do NOT invent requirements** — only use what's in the context file + Figma MCP data
 2. **Be specific** — reference actual steps, screens, and edge cases from the PRD
-3. **Be actionable** — every suggestion should be something the designer can do
-4. **Use the templates exactly** — follow the structure provided below
+3. **Cross-reference Figma** — if you fetched design context, compare it to the PRD flow
+4. **Be actionable** — every suggestion should be something the designer can do
+5. **Use the templates exactly** — follow the structure provided below
 
 ## Output (EXACTLY two files)
 

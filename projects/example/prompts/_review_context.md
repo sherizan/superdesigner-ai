@@ -1,7 +1,7 @@
 # Superdesigner Review Context
 Project: Daily Check-in Feature
 Slug: example
-Generated: 2026-01-06T22:41:17.632Z
+Generated: 2026-01-06T22:43:57.181Z
 
 ---
 
@@ -49,8 +49,22 @@ A daily check-in feature that helps users track their mood and productivity. Use
 
 ## Extracted from Figma
 
+### Figma URL
+https://www.figma.com/file/abc123/Daily-Check-in-Feature
+
+### File Key
+abc123
+
 ### Node ID (for comment pinning)
 *No node-id found in figma.md URL*
+
+### Figma MCP Instructions
+If Figma URL is available above, use Figma MCP to fetch design context:
+```
+mcp_Figma_get_design_context with:
+  fileKey: "abc123"
+  nodeId: "<NODE_ID>"
+```
 
 ---
 
