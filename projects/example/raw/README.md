@@ -1,6 +1,6 @@
 # Raw Artifacts
 
-Drop your source files here:
+Drop your source files under /raw folder:
 - PDFs (product specs, research reports)
 - PPTX (slide decks, presentations)
 - TXT/MD (notes, transcripts)
