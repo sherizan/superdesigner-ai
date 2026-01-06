@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment (contains secrets)
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log

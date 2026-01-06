@@ -1,0 +1,24 @@
+{
+  "name": "superdesigner",
+  "version": "0.1.0",
+  "description": "A lean design review workflow for Cursor. Drop artifacts, run one command, get a design review.",
+  "type": "module",
+  "scripts": {
+    "new": "node scripts/new.mjs",
+    "review": "node scripts/review.mjs",
+    "comment": "node scripts/comment.mjs",
+    "convert": "node scripts/convert.mjs"
+  },
+  "dependencies": {
+    "pizzip": "^3.1.7",
+    "xml2js": "^0.6.2"
+  },
+  "keywords": [
+    "design",
+    "review",
+    "figma",
+    "cursor",
+    "workflow"
+  ],
+  "license": "MIT"
+}
