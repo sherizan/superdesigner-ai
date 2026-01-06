@@ -60,9 +60,17 @@ Based on the PRD analysis:
 Use this prompt with Figma's AI features to scaffold your prototype:
 
 ```
-Create a prototype skeleton for "Daily Check-in Feature" with the following flow:
+Create a prototype skeleton for "Daily Check-in Feature".
 
-Main flow:
+## Context
+A daily check-in feature that helps users track their mood and productivity. Users answer 3 quick questions each day and see trends over time.
+
+## Goals
+- [x] Increase daily active users by 15%
+- [ ] Achieve 60% check-in completion rate
+- [ ] Reduce user churn by showing engagement value
+
+## User Flow
 1. User opens app and sees check-in prompt
 2. User taps "Start Check-in" button
 3. User answers mood question (emoji selector)
@@ -72,10 +80,10 @@ Main flow:
 7. User sees confirmation with streak count
 8. User can view trends dashboard
 
-Include frames for:
+## Required Frames
 - Overview
 
-For each screen, add placeholder states:
+## States (for each screen)
 - Default (happy path)
 - Empty state
 - Loading state
