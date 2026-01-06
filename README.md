@@ -15,7 +15,7 @@ Just fewer missed states and late surprises.
 
 Every design project looks “done” until review.
 
-- PRDs live in PDFs  
+- PRDs live in docs  
 - Research lives in decks  
 - Designs live in Figma  
 
@@ -64,43 +64,30 @@ npm run new -- "My Project"
 
 It will create the necessary files.
 
-3. Add your Figma design to figma.md.
+3. Fill in your project files:
+   - `figma.md` — Paste your Figma artboard link (with `node-id`)
+   - `prd.md` — Paste your PRD content
+   - `research.md` — Paste research findings (optional)
 
-4. Add your documents (Optional)
-
-Drop raw files into `/raw`:
-- PRDs (DOCS / PDF)
-- Research decks (PPTX / PDF)
-- Notes (MD / TXT)
-
-Run:
-```bash
-npm run convert -- my-project
-```
-
-Superdesigner converts them to Markdown files OR simply paste your PRD and Research findings in .md
+> 💡 **Tip:** If your docs are in Google Docs/PDF, ask ChatGPT to convert them to markdown first.
 
 ---
 
-5. Generate review prompts
+4. Generate review prompts
 ```bash
 npm run review -- my-project
 ```
 
-This creates prompts in `prompts/` folder.
-
-6. Run the prompt in Cursor Agent
+5. Run the prompt in Cursor Agent
 
 Open `prompts/_review_prompt.md` and run it with **Cursor Agent** (Cmd+I → Agent mode).
 
 The agent will:
-- Fetch your Figma design via MCP (if URL provided)
-- Cross-reference against your PRD and Research findings
+- Fetch your Figma design via MCP
+- Cross-reference against your PRD and research
 - Create `design-review.md` and `design-comments.preview.md`
 
-7. Read review notes generated to ensure they are useful.
-
-8. Review comments generated and post comments to Figma automatically
+6. Review the generated files, then post comments to Figma
 ```bash
 npm run comment -- my-project
 ```
@@ -120,6 +107,7 @@ Superdesigner exists to reduce design regret.
 
 ## Roadmap
 
+- Auto-convert docs to markdown (PDF, PPTX, DOCX)
 - Analytics cross-checks
 - Smarter gap detection
 - Figma plugin

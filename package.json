@@ -6,12 +6,7 @@
   "scripts": {
     "new": "node scripts/new.mjs",
     "review": "node scripts/review.mjs",
-    "comment": "node scripts/comment.mjs",
-    "convert": "node scripts/convert.mjs"
-  },
-  "dependencies": {
-    "pizzip": "^3.1.7",
-    "xml2js": "^0.6.2"
+    "comment": "node scripts/comment.mjs"
   },
   "keywords": [
     "design",

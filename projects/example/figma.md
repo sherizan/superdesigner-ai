@@ -1,14 +1,16 @@
 ---
 Project: Daily Check-in Feature
-Created: 2025-01-06T10:00:00.000Z
+Created: 2026-01-06T10:00:00.000Z
 ---
 
 # Figma Design Link
 
-## Main file
+## Main artboard
+
+> **Important:** Share a link to a specific artboard/section containing the flow. Sharing an entire file with multiple flows is not optimal for AI review.
 
 ```
-https://www.figma.com/file/abc123/Daily-Check-in-Feature
+https://www.figma.com/design/abc123xyz/Daily-Check-in-Feature?node-id=100-2456&t=example123
 ```
 
 ## Key frames
@@ -25,13 +27,13 @@ https://www.figma.com/file/abc123/Daily-Check-in-Feature
 ## Design system
 
 ```
-https://www.figma.com/file/xyz789/Design-System-v2
+https://www.figma.com/design/xyz789abc/Design-System-v2
 ```
 
 ## Prototype link
 
 ```
-https://www.figma.com/proto/abc123/Daily-Check-in-Feature
+https://www.figma.com/proto/abc123xyz/Daily-Check-in-Feature?node-id=100-2456
 ```
 
 ## Notes for reviewers

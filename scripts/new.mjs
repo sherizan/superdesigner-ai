@@ -5,7 +5,7 @@
  * Usage: npm run new -- "Project Name"
  */
 
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { slugify } from '../lib/slugify.mjs';
 import { copyTemplate, getProjectPath } from '../lib/files.mjs';
@@ -61,30 +61,9 @@ for (const [templateName, outputName] of templates) {
   copyTemplate(templateName, destPath, meta);
 }
 
-// Create raw/ folder for source artifacts
-const rawPath = join(projectPath, 'raw');
-mkdirSync(rawPath, { recursive: true });
-
 // Create prompts/ folder for generated prompts
 const promptsPath = join(projectPath, 'prompts');
 mkdirSync(promptsPath, { recursive: true });
-
-// Create README in raw folder
-const rawReadmeContent = `# Raw Artifacts
-
-Drop your source files here:
-- PDFs (product specs, research reports)
-- PPTX (slide decks, presentations)
-- TXT/MD (notes, transcripts)
-
-Then run:
-\`\`\`
-npm run convert -- ${slug}
-\`\`\`
-
-This extracts text and prepares prompts for Cursor Agent.
-`;
-writeFileSync(join(rawPath, 'README.md'), rawReadmeContent, 'utf-8');
 
 // Success output
 console.log('');
@@ -96,19 +75,12 @@ console.log('   - prd.md         (Product requirements)');
 console.log('   - research.md    (Research notes)');
 console.log('   - figma.md       (Figma link)');
 console.log('   - analytics.md   (Analytics requirements)');
-console.log('   - raw/           (Drop source files here)');
 console.log('   - prompts/       (Generated prompts go here)');
 console.log('');
 console.log('📝 Next steps:');
-console.log('');
-console.log('   Option A: Write from scratch');
 console.log('   1. Fill out prd.md with your requirements');
-console.log('   2. Add your Figma link in figma.md');
-console.log(`   3. Run: npm run review -- ${slug}`);
-console.log('   4. Open prompts/_review_prompt.md in Cursor Agent');
-console.log('');
-console.log('   Option B: Convert from raw files');
-console.log(`   1. Drop PDF/PPTX/TXT files into projects/${slug}/raw/`);
-console.log(`   2. Run: npm run convert -- ${slug}`);
-console.log('   3. Open prompts/_convert_prompt.md in Cursor Agent');
+console.log('   2. Add research.md with findings (optional)');
+console.log('   3. Add your Figma artboard link in figma.md');
+console.log(`   4. Run: npm run review -- ${slug}`);
+console.log('   5. Open prompts/_review_prompt.md in Cursor Agent');
 console.log('');

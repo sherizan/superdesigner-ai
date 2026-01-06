@@ -1,17 +1,20 @@
 # Superdesigner AI
 
-Superdesigner turns messy design artifacts (PRDs, research, Figma files)
-into actionable insights and feedback — before design review happens.
+**Design review, before design review happens.**
 
-Designers don’t miss things because they’re bad.
+Superdesigner turns fragmented design artifacts (PRDs, research, Figma files) into **clear, actionable design feedback** — *before* things ship.
+
+Designers don't miss things because they're bad.
 They miss things because artifacts are fragmented.
 
 Superdesigner connects them.
 
-## The problem
+---
+
+## The Problem
 
 Every design project has:
-- PRDs in PDFs
+- PRDs in docs
 - Research in decks
 - Designs in Figma
 - Feedback scattered in comments
@@ -21,40 +24,47 @@ After launch, you pay for them.
 
 Superdesigner is a safety net.
 
-## What Superdesigner is
+---
 
-- A Cursor-native workspace for designers
-- A deterministic design review system
-- An AI that reviews *intent*, not pixels
+## What Superdesigner Is
 
-It does NOT:
-- Generate UI
-- Replace Figma
-- Judge visual style
+- 🧠 A Cursor-native workspace for designers
+- 📋 A deterministic design review system
+- 🔍 An AI that reviews *intent*, not pixels
+
+**What it is NOT:**
+- ❌ UI generator
+- ❌ Figma replacement
+- ❌ Style critique tool
+
+---
 
 ## Requirements
 
 - Node.js 18+
-- **Cursor (recommended)**
-- Minimal dependencies: `pizzip` and `xml2js` for PPTX extraction
+- **Cursor** — [Download Cursor](https://www.cursor.com/)
+- **Figma MCP** — [Add to Cursor](https://www.figma.com/mcp-catalog/)
 
-Superdesigner is designed to work best with Cursor,
-as it relies on Cursor’s AI Agent to run the review and conversion prompts.
+Superdesigner is designed to work best with Cursor, as it relies on Cursor's AI Agent and Figma MCP to run the review prompts.
+
+---
 
 ## 60-Second Setup
+
 Open a terminal, then run:
 
 ```bash
-# Clone the template
 npx degit sherizan/superdesigner-ai my-superdesigner
 cd my-superdesigner
 npm install
 cursor .
 ```
 
+---
+
 ## Quick Start
 
-### Create a new project
+### 1. Create a new project
 
 ```bash
 npm run new -- "Your Project Name"
@@ -66,21 +76,32 @@ This creates `projects/your-project-name/` with template files:
 - `figma.md` — Figma file links
 - `analytics.md` — Analytics requirements
 
-### Generate a design review
+### 2. Fill in your project files
+
+- `figma.md` — Paste your Figma artboard link (with `node-id`)
+- `prd.md` — Paste your PRD content
+- `research.md` — Paste research findings (optional)
+
+> 💡 **Tip:** If your docs are in Google Docs/PDF, ask ChatGPT to convert them to markdown first.
+
+### 3. Generate review prompts
 
 ```bash
-# Review a single project
 npm run review -- your-project-name
-
-# Review all projects
-npm run review -- all
 ```
 
-This generates:
-- `design-review.md` — Structured review with flow analysis, states checklist, and gaps
-- `design-comments.preview.md` — Suggested comments to add to your Figma file
+This generates prompts in the `prompts/` folder.
 
-### Post comments to Figma (optional)
+### 4. Run the prompt in Cursor Agent
+
+1. Open `prompts/_review_prompt.md` in Cursor
+2. Run with Agent mode (`Cmd+I` / `Ctrl+I` → select Agent)
+3. The agent will:
+   - Fetch your Figma design via MCP
+   - Cross-reference against your PRD and research
+   - Create `design-review.md` and `design-comments.preview.md`
+
+### 5. Post comments to Figma (optional)
 
 ```bash
 # Preview comments without posting
@@ -92,47 +113,7 @@ npm run comment -- your-project-name
 
 This posts your suggested comments directly to your Figma file. See [Figma Commenting Setup](#figma-commenting-setup) below.
 
-## Convert Raw Files (PDF/PPTX)
-
-Have existing documents? Drop them into the `raw/` folder and convert them to structured PRD and research documents.
-
-### 1. Add raw files
-
-```bash
-# Drop files into the raw folder
-cp ~/Downloads/product-spec.pptx projects/your-project-name/raw/
-cp ~/Downloads/research-report.pdf projects/your-project-name/raw/
-```
-
-Supported formats: `.pdf`, `.pptx`, `.txt`, `.md`
-
-### 2. Run convert
-
-```bash
-npm run convert -- botim-quest
-```
-
-This creates two files:
-- `_superdesigner_convert_context.md` — Extracted text from your raw files
-- `_superdesigner_convert_prompt.md` — Instructions for Cursor Agent
-
-### 3. Use Cursor Agent
-
-1. Open `_superdesigner_convert_prompt.md` in Cursor
-2. Run with Agent mode (`Cmd+I` / `Ctrl+I` → select Agent)
-3. It will generate `prd.md` and `research.md` deterministically
-
-### 4. Continue with review
-
-```bash
-npm run review -- botim-quest
-```
-
-### Limitations (v0)
-
-- **PDF**: Text extraction is placeholder-only. Open the PDF, copy text, and paste into `_superdesigner_convert_context.md` where indicated.
-- **PPTX**: Full text extraction supported.
-- **No OCR**: Images in documents won't be processed.
+---
 
 ## Folder Structure
 
@@ -144,13 +125,15 @@ superdesigner/
 │       ├── research.md
 │       ├── figma.md
 │       ├── analytics.md
-│       ├── raw/                    # Drop source files here
-│       ├── design-review.md        # Generated
+│       ├── prompts/                  # Generated prompts
+│       ├── design-review.md          # Generated
 │       └── design-comments.preview.md  # Generated
 ├── templates/          # Templates for new projects
 ├── scripts/            # CLI commands
 └── lib/                # Shared utilities
 ```
+
+---
 
 ## Artifacts Explained
 
@@ -161,7 +144,9 @@ superdesigner/
 | `figma.md` | Links to Figma files and prototypes | Include `node-id` in URL to pin comments to specific frames |
 | `analytics.md` | Events, funnels, success metrics | Define what you'll measure |
 | `design-review.md` | **Generated** — Review output | Don't edit; regenerate with `npm run review` |
-| `design-comments.preview.md` | **Generated** — Suggested Figma comments | Copy these to your Figma file |
+| `design-comments.preview.md` | **Generated** — Suggested Figma comments | Review before posting to Figma |
+
+---
 
 ## How It Works
 
@@ -180,9 +165,11 @@ It then generates a review that includes:
 - **Suggestions** — Actionable next steps
 - **Figma Make Prompt** — Ready-to-use prompt for prototyping
 
+---
+
 ## Philosophy
 
-> "Superdesigner reviews intent, not pixels."
+> **Review intent early. Fix gaps before they become bugs.**
 
 This tool doesn't generate UI. It doesn't critique your visual design. Instead, it ensures you've thought through the **completeness** of your design:
 
@@ -191,6 +178,8 @@ This tool doesn't generate UI. It doesn't critique your visual design. Instead, 
 - Is there a clear flow from start to finish?
 
 Design regret happens when engineers discover missing states mid-sprint. Superdesigner catches these gaps early.
+
+---
 
 ## Figma Commenting Setup
 
@@ -230,8 +219,8 @@ https://www.figma.com/design/abc123xyz/My-Design-File?node-id=123-456
 **How to get the URL with node-id:**
 
 1. Open your Figma file
-2. Select the frame/section you want comments pinned to (e.g., "Happy Flows")
-3. Right-click → **Copy link to selection** (or press `Cmd+L` / `Ctrl+L`)
+2. Select the frame/section you want comments pinned to
+3. Press `Cmd+L` (Mac) or `Ctrl+L` (Windows) to copy link
 4. Paste the URL into your `figma.md`
 
 The URL should contain `?node-id=XXX-YYY` — this is what tells Superdesigner where to pin comments.
@@ -249,42 +238,29 @@ npm run comment -- my-project --dry-run
 npm run comment -- my-project
 ```
 
-**Tip:** If your Figma URL includes `node-id`, comments will be pinned to that specific frame. Otherwise, they'll post at file level.
+---
 
 ## Commands Reference
 
 | Command | Description |
 |---------|-------------|
 | `npm run new -- "Name"` | Create a new project |
-| `npm run convert -- slug` | Convert raw files to context + prompt |
-| `npm run convert -- all` | Convert raw files for all projects |
-| `npm run review -- slug` | Generate review for one project |
-| `npm run review -- all` | Generate reviews for all projects |
+| `npm run review -- slug` | Generate review prompts for one project |
+| `npm run review -- all` | Generate review prompts for all projects |
 | `npm run comment -- slug` | Post comments to Figma |
 | `npm run comment -- slug --dry-run` | Preview comments without posting |
 
+---
+
 ## Roadmap
 
-### v0.1 (Current)
-- [x] Project scaffolding
-- [x] Deterministic review generation
-- [x] States checklist
-- [x] Figma Make prompt generation
-- [x] Suggested comments preview
-- [x] Figma REST API commenting (file-level)
-- [x] Node-specific comments (attach to frames via `node-id`)
-- [x] Raw file conversion (PPTX + TXT/MD)
+- Auto-convert docs to markdown (PDF, PPTX, DOCX)
+- Analytics cross-checks
+- Smarter gap detection
+- Figma plugin
+- Team workflows
 
-### v0.2 (Planned)
-- [ ] PDF text extraction
-- [ ] Analytics validation checks
-- [ ] Custom review templates
-- [ ] Multi-node targeting (different nodeIds per comment)
-
-### v0.3 (Future)
-- [ ] AI-powered gap detection
-- [ ] Figma plugin for bidirectional sync
-- [ ] Team collaboration features
+---
 
 ## Contributing
 
@@ -294,6 +270,8 @@ This is a Cursor-native workflow tool. Contributions welcome:
 2. Create a feature branch
 3. Make your changes
 4. Submit a PR
+
+---
 
 ## License
 

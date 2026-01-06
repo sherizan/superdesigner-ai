@@ -1,6 +1,8 @@
 # Figma Design Link
 
-## Main file
+## Main artboard
+
+> **Important:** Share a link to a specific artboard/section containing the flow. Sharing an entire file with multiple flows is not optimal for AI review.
 
 *Paste your Figma file URL here (include `node-id` to pin comments to a specific frame):*
 
@@ -27,7 +29,7 @@ https://www.figma.com/design/YOUR_FILE_KEY/File-Name?node-id=123-456
 *Link to design system or component library if applicable:*
 
 ```
-https://www.figma.com/file/...
+https://www.figma.com/design/...
 ```
 
 ## Prototype link
