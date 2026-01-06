@@ -41,7 +41,7 @@ That’s where gaps hide.
 ## Requirements
 
 - Node.js 18+
-- **Cursor**
+- **Cursor** — [Download Cursor](https://www.cursor.com/)
 - **Figma MCP** — [Add to Cursor](https://www.figma.com/mcp-catalog/)
 
 ---
