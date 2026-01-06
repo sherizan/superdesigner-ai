@@ -223,8 +223,14 @@ async function convertProject(slug) {
   const contextContent = generateContext(slug, extractedFiles);
   const promptContent = generatePrompt(slug);
 
-  const contextPath = join(projectPath, '_superdesigner_convert_context.md');
-  const promptPath = join(projectPath, '_superdesigner_convert_prompt.md');
+  // Ensure prompts folder exists
+  const promptsPath = join(projectPath, 'prompts');
+  if (!existsSync(promptsPath)) {
+    mkdirSync(promptsPath, { recursive: true });
+  }
+
+  const contextPath = join(promptsPath, '_convert_context.md');
+  const promptPath = join(promptsPath, '_convert_prompt.md');
 
   writeFile(contextPath, contextContent);
   writeFile(promptPath, promptContent);
@@ -233,8 +239,8 @@ async function convertProject(slug) {
 
   console.log('');
   console.log(`✅ ${slug}`);
-  console.log(`   → _superdesigner_convert_context.md`);
-  console.log(`   → _superdesigner_convert_prompt.md`);
+  console.log(`   → prompts/_convert_context.md`);
+  console.log(`   → prompts/_convert_prompt.md`);
   
   if (hasPlaceholders) {
     console.log('');
@@ -299,7 +305,8 @@ if (target === 'all') {
 
 console.log('');
 console.log('📝 Next steps:');
-console.log('   1. Open _superdesigner_convert_prompt.md in Cursor');
+console.log('   1. Open prompts/_convert_prompt.md in Cursor');
 console.log('   2. Run with Cursor Agent (Cmd+I / Ctrl+I → Agent mode)');
-console.log('   3. It will create prd.md and research.md deterministically');
+console.log('   3. It will create prd.md and research.md');
+console.log('   4. Then run: npm run review -- <slug>');
 console.log('');

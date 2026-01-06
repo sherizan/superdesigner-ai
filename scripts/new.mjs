@@ -65,6 +65,10 @@ for (const [templateName, outputName] of templates) {
 const rawPath = join(projectPath, 'raw');
 mkdirSync(rawPath, { recursive: true });
 
+// Create prompts/ folder for generated prompts
+const promptsPath = join(projectPath, 'prompts');
+mkdirSync(promptsPath, { recursive: true });
+
 // Create README in raw folder
 const rawReadmeContent = `# Raw Artifacts
 
@@ -78,7 +82,7 @@ Then run:
 npm run convert -- ${slug}
 \`\`\`
 
-This extracts text and prepares prompts for Cursor Agent to generate \`prd.md\` and \`research.md\`.
+This extracts text and prepares prompts for Cursor Agent.
 `;
 writeFileSync(join(rawPath, 'README.md'), rawReadmeContent, 'utf-8');
 
@@ -93,6 +97,7 @@ console.log('   - research.md    (Research notes)');
 console.log('   - figma.md       (Figma link)');
 console.log('   - analytics.md   (Analytics requirements)');
 console.log('   - raw/           (Drop source files here)');
+console.log('   - prompts/       (Generated prompts go here)');
 console.log('');
 console.log('📝 Next steps:');
 console.log('');
@@ -100,9 +105,10 @@ console.log('   Option A: Write from scratch');
 console.log('   1. Fill out prd.md with your requirements');
 console.log('   2. Add your Figma link in figma.md');
 console.log(`   3. Run: npm run review -- ${slug}`);
+console.log('   4. Open prompts/_review_prompt.md in Cursor Agent');
 console.log('');
 console.log('   Option B: Convert from raw files');
 console.log(`   1. Drop PDF/PPTX/TXT files into projects/${slug}/raw/`);
 console.log(`   2. Run: npm run convert -- ${slug}`);
-console.log('   3. Use Cursor Agent with the generated prompt');
+console.log('   3. Open prompts/_convert_prompt.md in Cursor Agent');
 console.log('');
