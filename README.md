@@ -42,7 +42,7 @@ That’s where gaps hide.
 
 - Node.js 18+
 - **Cursor**
-- **Figma MCP** — [Add to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=Figma&config=eyJ1cmwiOiJodHRwczovL21jcC5maWdtYS5jb20vbWNwIiwiaGVhZGVycyI6e319)
+- **Figma MCP** — [Add to Cursor](https://www.figma.com/mcp-catalog/)
 
 ---
 
