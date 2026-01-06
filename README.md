@@ -95,16 +95,17 @@ Open `prompts/_review_prompt.md` and run it with **Cursor Agent** (Cmd+I → Age
 
 The agent will:
 - Fetch your Figma design via MCP (if URL provided)
-- Cross-reference against your PRD
+- Cross-reference against your PRD and Research findings
 - Create `design-review.md` and `design-comments.preview.md`
 
-7. Post comments to Figma
+7. Read review notes generated to ensure they are useful.
 
+8. Review comments generated and post comments to Figma automatically
 ```bash
 npm run comment -- my-project
 ```
 
-Done!
+Done! Design is reviewed.
 
 ---
 
