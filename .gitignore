@@ -4,6 +4,10 @@ node_modules/
 # Environment (contains secrets)
 .env
 
+# Projects (keep only example in repo)
+projects/*
+!projects/example/
+
 # OS files
 .DS_Store
 Thumbs.db
