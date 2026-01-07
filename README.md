@@ -43,10 +43,11 @@ That’s where gaps hide.
 - Node.js 18+
 - **Cursor** — [Download Cursor](https://www.cursor.com/)
 - **Figma MCP** — [Add to Cursor](https://www.figma.com/mcp-catalog/)
+- **Figma Access Token** [Generate token](https://help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens)
 
 ---
 
-## 60-second start
+## 7-step start
 1. Open your terminal
 
 ```bash
@@ -56,7 +57,19 @@ npm install
 cursor .
 ```
 
-2. Open Cursor's built-in terminal
+2. Set up your .env file
+
+Duplicate `.env.example` and rename it to `.env`:
+
+Open `.env` and paste your token after the `=` sign:
+
+```
+FIGMA_ACCESS_TOKEN=figd_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+The `.env` file is gitignored, so your token stays private.
+
+3. Open Cursor's built-in terminal
 
 ```bash
 npm run new -- "My Project"
@@ -64,7 +77,7 @@ npm run new -- "My Project"
 
 It will create the necessary files.
 
-3. Fill in your project files:
+4. Fill in your project files:
    - `figma.md` — Paste your Figma artboard link (with `node-id`)
    - `prd.md` — Paste your PRD content
    - `research.md` — Paste research findings (optional)
@@ -73,21 +86,21 @@ It will create the necessary files.
 
 ---
 
-4. Generate review prompts
+5. Generate review prompts
 ```bash
 npm run review -- my-project
 ```
 
-5. Run the prompt in Cursor Agent
+6. Run the prompt in Cursor Agent
 
-Open `prompts/_review_prompt.md` and run it with **Cursor Agent** (Cmd+I → Agent mode).
+Right click `prompts/_review_prompt.md` and "Add File to Cursor Chat" with **Cursor Agent** hit enter (Agent mode + your preferred model).
 
 The agent will:
 - Fetch your Figma design via MCP
 - Cross-reference against your PRD and research
 - Create `design-review.md` and `design-comments.preview.md`
 
-6. Review the generated files, then post comments to Figma
+7. Review the generated files, then post comments to Figma
 ```bash
 npm run comment -- my-project
 ```
