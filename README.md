@@ -28,13 +28,11 @@ That’s where gaps hide.
 ## What it is
 
 - 🧠 Cursor-native AI workflow for designers  
-- 📋 Deterministic design review (flows, states, edge cases)  
-- 🔍 Reviews **intent**, not pixels  
-
-**What it is NOT**
-- ❌ UI generator  
-- ❌ Figma replacement  
-- ❌ Style critique tool  
+- 🗂️ Add PRD, Research, Notes, Figma files 
+- 📋 Deterministic design review (flows, states, edge cases, gaps, insights)  
+- 🔍 Connects to Figma MCP
+- 🤯 Leaves individual comments on screens based on report
+- 📲 Creates Figma Make prompts of proposed solutions
 
 ---
 
@@ -47,7 +45,8 @@ That’s where gaps hide.
 
 ---
 
-## 7-step start
+## 30 second setup
+
 1. Open your terminal
 
 ```bash
@@ -57,11 +56,10 @@ npm install
 cursor .
 ```
 
-2. Set up your .env file
+2. Optional - Set up your .env file (Post comments on Figma)
 
-Duplicate `.env.example` and rename it to `.env`:
-
-Open `.env` and paste your token after the `=` sign:
+- Duplicate `.env.example` and rename it to `.env`:
+- Open `.env` and paste your token after the `=` sign:
 
 ```
 FIGMA_ACCESS_TOKEN=figd_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -69,7 +67,11 @@ FIGMA_ACCESS_TOKEN=figd_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 The `.env` file is gitignored, so your token stays private.
 
-3. Open Cursor's built-in terminal
+---
+
+## Tutorial - Create a new project
+
+1. Open Cursor's built-in terminal
 
 ```bash
 npm run new -- "My Project"
@@ -77,33 +79,40 @@ npm run new -- "My Project"
 
 It will create the necessary files.
 
-4. Fill in your project files:
+2. Fill in your project files:
    - `figma.md` — Paste your Figma artboard link (with `node-id`)
    - `prd.md` — Paste your PRD content
-   - `research.md` — Paste research findings (optional)
+   - `research.md` — Paste research notes, insights, competitor findings
 
 > 💡 **Tip:** If your docs are in Google Docs/PDF, ask ChatGPT to convert them to markdown first.
 
----
-
-5. Generate review prompts
+3. Generate review prompts
 ```bash
 npm run review -- my-project
 ```
 
-6. Run the prompt in Cursor Agent
+This command scans all your documents for context and creates a Prompt for Cursor AI agent.
+
+4. Run the prompt in Cursor Agent
 
 Right click `prompts/_review_prompt.md` and "Add File to Cursor Chat" with **Cursor Agent** hit enter (Agent mode + your preferred model).
 
 The agent will:
 - Fetch your Figma design via MCP
 - Cross-reference against your PRD and research
-- Create `design-review.md` and `design-comments.preview.md`
+- Create `design-review.md` and `design-comments.preview.md` when its done
 
-7. Review the generated files, then post comments to Figma
+5. The Magic Moment - Read the output
+
+Open design-review.md and read the in-depth report
+
+6. Post comments to Figma
 ```bash
 npm run comment -- my-project
 ```
+
+Superdesigner will only post high-confidence comments only (Up to 7 for now).
+It attachs them to relevant frames and never touches your UI.
 
 Done! Design is reviewed.
 
@@ -111,8 +120,8 @@ Done! Design is reviewed.
 
 ## Philosophy
 
-> **Review intent early.  
-> Fix gaps before they become bugs.**
+> Superdesigner reviews intent, not pixels.
+> It catches what we miss when things move fast.
 
 Superdesigner exists to reduce design regret.
 
@@ -124,7 +133,6 @@ Superdesigner exists to reduce design regret.
 - Analytics cross-checks
 - Smarter gap detection
 - Figma plugin
-- Team workflows
 
 ---
 
