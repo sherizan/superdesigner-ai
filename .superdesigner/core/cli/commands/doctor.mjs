@@ -2,11 +2,29 @@
  * Doctor command - checks system requirements and configuration.
  */
 
-import { existsSync, mkdirSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync } from 'fs';
 import { spawn } from 'child_process';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { findWorkspaceRoot, getPackageRoot, getTemplatesRoot, ensureProjectsFolder } from '../../../lib/files.mjs';
+import { track, getCommonProps } from '../../../lib/telemetry.mjs';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PACKAGE_ROOT = join(__dirname, '../../../..');
 const MIN_NODE_VERSION = 18;
+
+/**
+ * Get package version from package.json.
+ */
+function getVersion() {
+  try {
+    const pkgPath = join(PACKAGE_ROOT, 'package.json');
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+    return pkg.version || '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+}
 
 /**
  * Check if Node.js version meets minimum requirement.
@@ -117,6 +135,10 @@ async function checkCursorAgent() {
  * @returns {Promise<void>}
  */
 export async function run(args) {
+  // Track command execution (best-effort, non-blocking)
+  const version = getVersion();
+  track('cmd_doctor', getCommonProps(version), { args });
+
   const autoFix = args.includes('--fix');
   
   console.log('');
