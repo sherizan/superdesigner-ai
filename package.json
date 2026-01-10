@@ -1,19 +1,34 @@
 {
   "name": "superdesigner",
   "version": "0.1.0",
-  "description": "A lean design review workflow for Cursor. Drop artifacts, run one command, get a design review.",
+  "description": "Design review, before design review happens.",
   "type": "module",
+  "bin": {
+    "superdesigner": "./.superdesigner/bin/superdesigner.js"
+  },
+  "files": [
+    ".superdesigner/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "new": "node scripts/new.mjs",
-    "review": "node scripts/review.mjs",
-    "comment": "node scripts/comment.mjs"
+    "init": "node ./.superdesigner/bin/superdesigner.js init",
+    "new": "node ./.superdesigner/bin/superdesigner.js init",
+    "review": "node ./.superdesigner/bin/superdesigner.js review",
+    "comment": "node ./.superdesigner/bin/superdesigner.js comment",
+    "doctor": "node ./.superdesigner/bin/superdesigner.js doctor"
   },
   "keywords": [
     "design",
     "review",
     "figma",
     "cursor",
-    "workflow"
+    "ai"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sherizan/superdesigner-ai"
+  },
   "license": "MIT"
 }

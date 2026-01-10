@@ -28,7 +28,7 @@ Why:
 ---
 
 *Total: {n} comments*
-*Run `npm run comment -- {project-slug}` to post to Figma.*
+*Run `superdesigner comment {project-slug}` to post to Figma.*
 
 ---
 

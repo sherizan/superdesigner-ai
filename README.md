@@ -1,141 +1,160 @@
-# Superdesigner AI
+# Superdesigner
 
-**Design review, before design review happens.**
+**Run this once**
 
-Superdesigner turns fragmented design artifacts  
-(PRDs, research, Figma files) into **clear, actionable design feedback** — *before* things ship.
-
-No UI generation.  
-No visual critique.  
-Just fewer missed states and late surprises.
+Superdesigner is a product reasoning workflow that runs inside Cursor, connecting PRDs, research, designs, and analytics to surface design gaps and blind spots before review, handoff, or launch.
 
 ---
 
-## Why this exists
+## Setup Guide
 
-Every design project looks “done” until review.
+### Step 1: Check prerequisites
 
-- PRDs live in docs  
-- Research lives in decks  
-- Designs live in Figma  
+You'll need:
+- **Node.js 18+** — [Download here](https://nodejs.org) if you don't have it
+- **Cursor** — [Download here](https://cursor.com) (free)
 
-That’s where gaps hide.
+To check your Node version:
+```bash
+node --version
+# Should show v18.x.x or higher
+```
 
-**Superdesigner connects intent across artifacts and surfaces what’s missing.**
+### Step 2: Get Superdesigner
+
+Clone or download this repo:
+```bash
+git clone https://github.com/sherizan/superdesigner-ai.git
+cd superdesigner-ai
+```
+
+### Step 3: Install
+
+```bash
+npm install && npm link
+```
+
+This installs dependencies and lets you run `superdesigner` from anywhere.
+
+### Step 4: Install Cursor CLI (optional)
+
+To use `--agent` mode (automated reviews), install and authenticate the Cursor CLI:
+
+```bash
+curl https://cursor.com/install -fsS | bash
+agent login
+```
+
+Or from Cursor: `Cmd+Shift+P` → "Install 'agent' command", then run `agent login` in terminal.
+
+Skip this if you prefer running prompts manually in Cursor.
+
+### Step 5: Verify it works
+
+```bash
+superdesigner doctor
+```
+
+You should see all green checkmarks. If something's wrong, the doctor will tell you how to fix it.
 
 ---
 
-## What it is
+## Getting Started
 
-- 🧠 Cursor-native AI workflow for designers  
-- 🗂️ Add PRD, Research, Notes, Figma files 
-- 📋 Deterministic design review (flows, states, edge cases, gaps, insights)  
-- 🔍 Connects to Figma MCP
-- 🤯 Leaves individual comments on screens based on report
-- 📲 Creates Figma Make prompts of proposed solutions
+```bash
+# 1. Create a project
+superdesigner init "Checkout Flow"
+
+# 2. Fill in your context (requirements, research, Figma link)
+# Edit: projects/checkout-flow/context/
+
+# 3. Generate your design review
+superdesigner review checkout-flow --agent
+```
+
+The `--agent` flag runs Cursor automatically to generate your review.
+
+**Without Cursor CLI?** Run without `--agent`, then open the generated prompt in Cursor manually.
+
+---
+
+## How It Works
+
+```
+You write                    Superdesigner generates
+─────────────────────────    ─────────────────────────
+context/prd.md          →    insights/design-review.md
+context/research.md     →    insights/design-comments.preview.md
+context/figma.md
+```
+
+**Context** = what you know (requirements, research, Figma links)  
+**Insights** = what Superdesigner finds (missing states, edge cases, questions)
+
+---
+
+## Commands
+
+| Command | What it does |
+|---------|--------------|
+| `superdesigner init "Name"` | Create a new project |
+| `superdesigner review <project>` | Generate design review |
+| `superdesigner review <project> --agent` | Generate and run with Cursor Agent |
+| `superdesigner comment <project>` | Post comments to Figma |
+| `superdesigner doctor` | Check if everything is set up |
+
+---
+
+## What Goes in Context?
+
+| File | What to put |
+|------|-------------|
+| `prd.md` | Your product requirements — goals, user stories, acceptance criteria |
+| `research.md` | User research, interviews, insights (optional) |
+| `figma.md` | Link to your Figma file |
+| `analytics.md` | What you want to track (optional) |
+
+---
+
+## What You Get Back
+
+**design-review.md** — A structured review covering:
+- Missing states (empty, loading, error)
+- Edge cases you might have missed
+- Questions about unclear requirements
+- Suggestions for improvement
+
+**design-comments.preview.md** — Ready-to-post Figma comments (preview before posting)
+
+---
+
+## Tips
+
+- **Start small.** Even a rough PRD generates useful feedback.
+- **Be specific.** The more context you give, the better the review.
+- **Iterate.** Update your context, re-run review, see what changes.
+
+---
+
+## Troubleshooting
+
+```bash
+superdesigner doctor
+```
+
+This checks your setup and tells you what to fix.
 
 ---
 
 ## Requirements
 
-- Node.js 18+
-- **Cursor** — [Download Cursor](https://www.cursor.com/)
-- **Figma MCP** — [Add to Cursor](https://www.figma.com/mcp-catalog/)
-- **Figma Access Token** [Generate token](https://help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens)
+- Node.js 18 or later
+- [Cursor](https://cursor.com) (for running the generated prompts)
+- [Cursor CLI](https://cursor.com/docs/cli/headless) (optional, for `--agent` mode)
+- Figma account (optional, for posting comments)
 
 ---
 
-## 30 second setup
+Created by [Sherizan Sheikh](https://github.com/sherizan)
 
-1. Open your terminal
-
-```bash
-npx degit sherizan/superdesigner-ai my-superdesigner && echo "Done"
-cd my-superdesigner
-npm install
-cursor .
-```
-
-2. Optional - Set up your .env file (Post comments on Figma)
-
-- Duplicate `.env.example` and rename it to `.env`:
-- Open `.env` and paste your token after the `=` sign:
-
-```
-FIGMA_ACCESS_TOKEN=figd_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
-
-The `.env` file is gitignored, so your token stays private.
-
----
-
-## Tutorial - Create a new project
-
-1. Open Cursor's built-in terminal
-
-```bash
-npm run new -- "My Project"
-```
-
-It will create the necessary files.
-
-2. Fill in your project files:
-   - `figma.md` — Paste your Figma artboard link (with `node-id`)
-   - `prd.md` — Paste your PRD content
-   - `research.md` — Paste research notes, insights, competitor findings
-
-> 💡 **Tip:** If your docs are in Google Docs/PDF, ask ChatGPT to convert them to markdown first.
-
-3. Generate review prompts
-```bash
-npm run review -- my-project
-```
-
-This command scans all your documents for context and creates a Prompt for Cursor AI agent.
-
-4. Run the prompt in Cursor Agent
-
-Right click `prompts/_review_prompt.md` and "Add File to Cursor Chat" with **Cursor Agent** hit enter (Agent mode + your preferred model).
-
-The agent will:
-- Fetch your Figma design via MCP
-- Cross-reference against your PRD and research
-- Create `design-review.md` and `design-comments.preview.md` when its done
-
-5. The Magic Moment - Read the output
-
-Open design-review.md and read the in-depth report
-
-6. Post comments to Figma
-```bash
-npm run comment -- my-project
-```
-
-Superdesigner will only post high-confidence comments only (Up to 7 for now).
-It attachs them to relevant frames and never touches your UI.
-
-Done! Design is reviewed.
-
----
-
-## Philosophy
-
-> Superdesigner reviews intent, not pixels.
-> It catches what we miss when things move fast.
-
-Superdesigner exists to reduce design regret.
-
----
-
-## Roadmap
-
-- Auto-convert docs to markdown (PDF, PPTX, DOCX)
-- Analytics cross-checks
-- Smarter gap detection
-- Figma plugin
-
----
-
-## License
-
-MIT
+MIT License

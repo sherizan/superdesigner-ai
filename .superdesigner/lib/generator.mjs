@@ -407,8 +407,8 @@ Generated: ${date}
     why: 'Error recovery — users should be able to correct mistakes'
   });
   
-  // Limit to 7 comments max
-  const finalComments = suggestedComments.slice(0, 7);
+  // Limit to 10 comments max
+  const finalComments = suggestedComments.slice(0, 10);
   
   finalComments.forEach((item, i) => {
     // Build nodeId line only if we have one
@@ -434,7 +434,7 @@ ${item.why}
   });
 
   output += `*Total: ${finalComments.length} comments*
-*Run \`npm run comment -- ${projectName.toLowerCase().replace(/\s+/g, '-')}\` to post to Figma.*
+*Run \`superdesigner comment ${projectName.toLowerCase().replace(/\s+/g, '-')}\` to post to Figma.*
 `;
 
   return output;

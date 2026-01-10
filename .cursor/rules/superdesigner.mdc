@@ -1,0 +1,81 @@
+# Superdesigner Review Rules
+
+**Superdesigner reviews intent, not pixels.**
+
+## Figma MCP (REQUIRED)
+
+**You MUST use Figma MCP tools to analyze designs:**
+
+1. Read `projects/<slug>/context/figma.md` to get Figma URLs
+2. Extract fileKey and nodeId from each URL
+3. Use `mcp_Figma_get_metadata` to get nested frame structure
+4. Use `mcp_Figma_get_design_context` on key screens
+5. Use nested screen nodeIds (not parent frames) for comments
+
+This ensures comments are pinned to specific screens in Figma, not just parent frames.
+
+## File Access Contract
+
+### READ ONLY
+- `projects/<slug>/context/*` - User-provided context files
+- `.superdesigner/templates/*` - Output format templates
+
+### WRITE ONLY
+- `projects/<slug>/insights/*` - Generated review outputs
+
+### DO NOT MODIFY
+- `.superdesigner/` - Engine code (except reading templates)
+- `package.json`
+- `node_modules/`
+
+## Output Files
+
+Generate exactly two files:
+
+### 1. design-review.md
+**Follow the format in:** `.superdesigner/templates/design-review.template.md`
+
+Key sections:
+- Executive Summary
+- PRD Alignment (✅ Covered / ❓ Missing)
+- States Review (per flow: Happy, Empty, Loading, Error, Recovery)
+- Edge Cases (Offline, Permissions, Session, Accessibility, etc.)
+- Research Findings Alignment
+- Analytics Assumptions
+- Recommendations (P0/P1/P2)
+- Questions for Design Team
+
+### 2. design-comments.preview.md
+**IMPORTANT**: Follow the EXACT format in `.superdesigner/templates/design-comments.template.md`
+
+- Use `## Comment N` headers
+- Include all required fields: page, frame, nodeId, Type, Message, Why
+- Limit to 10 most important comments
+
+## Review Checklists
+
+### States (every screen)
+- [ ] Happy path
+- [ ] Empty state
+- [ ] Loading state
+- [ ] Error state
+- [ ] Recovery path
+
+### Edge Cases
+- Offline behavior
+- Permission denied
+- Session timeout
+- Rate limiting
+- Accessibility
+
+### PRD Alignment
+- Does each PRD step have a screen?
+- Are all goals addressed?
+- Are edge cases covered?
+
+## Tone
+
+1. **Direct** — State observations clearly
+2. **Question-based** — Frame gaps as questions
+3. **Concise** — One idea per comment
+4. **Actionable** — Suggest what to do

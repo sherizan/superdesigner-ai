@@ -2,14 +2,15 @@
 
 /**
  * Post comments to Figma using REST API.
- * Usage: npm run comment -- <project-slug> [--dry-run]
+ * Usage: superdesigner comment [project-slug] [--dry-run]
  */
 
 import { join } from 'path';
-import { readFile, projectExists, getProjectPath } from '../lib/files.mjs';
+import { readFile, projectExists, getContextPath, getInsightsPath, listProjectDirs } from '../lib/files.mjs';
+import { selectProject } from '../lib/prompt.mjs';
 
 const FIGMA_API_BASE = 'https://api.figma.com/v1';
-const MAX_COMMENTS = 7;
+const MAX_COMMENTS = 10;
 
 /**
  * Extract Figma file key from figma.md content.
@@ -69,9 +70,12 @@ function parseComments(content) {
     }
     
     // Extract nodeId from Target block (for pinning to specific Figma node)
+    // Normalize to colon format (Figma API uses colons, e.g., "424:51708")
     const nodeIdMatch = block.match(/^\s*nodeId:\s*(.+)$/m);
     if (nodeIdMatch) {
-      comment.nodeId = nodeIdMatch[1].trim();
+      const rawId = nodeIdMatch[1].trim();
+      // Convert hyphen to colon if needed
+      comment.nodeId = rawId.replace('-', ':');
     }
     
     // Extract Type
@@ -132,17 +136,19 @@ function formatCommentForFigma(comment) {
  * @param {string} message - Comment text
  * @param {string} token - Figma access token
  * @param {string|null} nodeId - Optional node ID to pin comment to (e.g., "12629:33522")
+ * @param {number} index - Comment index for positioning offset (0-based)
  * @returns {Promise<{success: boolean, error?: string}>}
  */
-async function postComment(fileKey, message, token, nodeId = null) {
+async function postComment(fileKey, message, token, nodeId = null, index = 0) {
   try {
     const body = { message };
     
     // If nodeId provided, pin comment to that specific node
+    // Offset each comment by 60px vertically to avoid overlap
     if (nodeId) {
       body.client_meta = {
         node_id: nodeId,
-        node_offset: { x: 0, y: 0 }
+        node_offset: { x: 0, y: index * 60 }
       };
     }
     
@@ -157,10 +163,16 @@ async function postComment(fileKey, message, token, nodeId = null) {
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      return { 
-        success: false, 
-        error: errorData.message || `HTTP ${response.status}` 
-      };
+      // Provide more context for common errors
+      let errorMsg = errorData.message || `HTTP ${response.status}`;
+      if (response.status === 404) {
+        errorMsg = 'File or node not found. Check file key and node ID.';
+      } else if (response.status === 403) {
+        errorMsg = 'Permission denied. Check token has "Comments" permission.';
+      } else if (response.status === 400) {
+        errorMsg = `Bad request: ${errorData.message || 'Check node ID format (should be like 424:51708)'}`;
+      }
+      return { success: false, error: errorMsg };
     }
     
     return { success: true };
@@ -190,7 +202,7 @@ function printSetupInstructions() {
   console.log('   FIGMA_ACCESS_TOKEN=your_token_here');
   console.log('');
   console.log('5. Run the comment command again:');
-  console.log('   npm run comment -- <project-slug>');
+  console.log('   superdesigner comment <project-slug>');
   console.log('');
 }
 
@@ -218,18 +230,46 @@ function loadEnv() {
   }
 }
 
+/**
+ * Get project slug from args or interactive selection.
+ * @param {string[]} args - Command line arguments (excluding flags)
+ * @returns {Promise<string|null>} - Selected slug or null
+ */
+async function getTargetSlug(args) {
+  // If slug provided, use it
+  if (args.length > 0) {
+    return args[0];
+  }
+
+  // Otherwise, auto-detect or prompt
+  const projects = listProjectDirs();
+
+  if (projects.length === 0) {
+    console.error('❌ No projects found.');
+    console.error('   Create one with: superdesigner init "Project Name"');
+    return null;
+  }
+
+  if (projects.length === 1) {
+    console.log(`📂 Auto-selected: ${projects[0]}`);
+    return projects[0];
+  }
+
+  // Multiple projects - show selection menu
+  return await selectProject(projects);
+}
+
 // Parse command line args
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
-const slug = args.find(arg => !arg.startsWith('--'));
+const positionalArgs = args.filter(arg => !arg.startsWith('--'));
+
+console.log('');
+console.log('💬 Superdesigner Comment');
+
+const slug = await getTargetSlug(positionalArgs);
 
 if (!slug) {
-  console.error('❌ Error: Please provide a project slug.');
-  console.error('');
-  console.error('Usage: npm run comment -- <project-slug> [--dry-run]');
-  console.error('');
-  console.error('Options:');
-  console.error('  --dry-run    Preview comments without posting');
   process.exit(1);
 }
 
@@ -238,27 +278,31 @@ if (!projectExists(slug)) {
   process.exit(1);
 }
 
-const projectPath = getProjectPath(slug);
-const commentsPath = join(projectPath, 'design-comments.preview.md');
-const figmaPath = join(projectPath, 'figma.md');
+const contextPath = getContextPath(slug);
+const insightsPath = getInsightsPath(slug);
 
-// Read comments file
+// Read comments from insights/
+const commentsPath = join(insightsPath, 'design-comments.preview.md');
 const commentsContent = readFile(commentsPath);
+
 if (!commentsContent) {
-  console.error('❌ No design-comments.preview.md found.');
   console.error('');
-  console.error('Run: npm run review -- ' + slug);
+  console.error('❌ No design-comments.preview.md found in insights/');
+  console.error('');
+  console.error(`Run: superdesigner review ${slug}`);
   process.exit(1);
 }
 
-// Read figma.md and extract file key
+// Read figma.md from context/ and extract file key
+const figmaPath = join(contextPath, 'figma.md');
 const figmaContent = readFile(figmaPath);
 const fileKey = extractFileKey(figmaContent);
 
 if (!fileKey) {
+  console.error('');
   console.error('❌ Could not find Figma file key.');
   console.error('');
-  console.error('Add a Figma URL to projects/' + slug + '/figma.md:');
+  console.error(`Add a Figma URL to projects/${slug}/context/figma.md:`);
   console.error('  https://www.figma.com/file/YOUR_FILE_KEY/...');
   console.error('');
   console.error('Or add an explicit FileKey line:');
@@ -276,8 +320,6 @@ if (comments.length === 0) {
   process.exit(0);
 }
 
-console.log('');
-console.log('💬 Superdesigner Comment');
 console.log('');
 console.log(`Project: ${slug}`);
 console.log(`File key: ${fileKey}`);
@@ -322,9 +364,18 @@ console.log('');
 let successCount = 0;
 let failCount = 0;
 
+// Track offset per nodeId so comments on same node don't overlap
+const nodeOffsets = new Map();
+
 for (const comment of comments) {
   const formatted = formatCommentForFigma(comment);
-  const result = await postComment(fileKey, formatted, token, comment.nodeId);
+  
+  // Get current offset for this nodeId (or 0 if first comment on this node)
+  const nodeKey = comment.nodeId || 'file-level';
+  const currentOffset = nodeOffsets.get(nodeKey) || 0;
+  nodeOffsets.set(nodeKey, currentOffset + 1);
+  
+  const result = await postComment(fileKey, formatted, token, comment.nodeId, currentOffset);
   
   const preview = comment.message.split('\n')[0];
   const displayText = `[${comment.type}] ${preview}`;
