@@ -5,8 +5,9 @@ node_modules/
 .env
 .env.local
 
-# Generated insights (regenerated on review)
-projects/**/insights/
+# User projects (not part of the template)
+projects/*
+!projects/.gitkeep
 
 # OS files
 .DS_Store
