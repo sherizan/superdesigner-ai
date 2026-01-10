@@ -21,3 +21,6 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Owner-only docs
+.superdesigner/docs/analytics-queries.md

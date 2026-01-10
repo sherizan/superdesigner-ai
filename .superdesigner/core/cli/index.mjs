@@ -104,8 +104,9 @@ Commands:
   doctor    Check system requirements and configuration
 
 Options:
-  -h, --help     Show this help message
-  -v, --version  Show version number
+  -h, --help       Show this help message
+  -v, --version    Show version number
+  --no-telemetry   Disable anonymous usage telemetry
 
 Review Options:
   --agent                  Run Cursor Agent after generating prompts
@@ -118,6 +119,11 @@ Examples:
   superdesigner review my-project --agent --agent-timeout 15
   superdesigner comment my-project --dry-run
   superdesigner doctor
+
+Telemetry:
+  Anonymous usage stats (command, version, OS) are collected to improve
+  Superdesigner. No PRD, file paths, or personal info is collected.
+  Opt-out: SUPERDESIGNER_TELEMETRY=0 or --no-telemetry
 `);
 }
 

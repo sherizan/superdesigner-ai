@@ -5,13 +5,28 @@
  */
 
 import { spawn } from 'child_process';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { findWorkspaceRoot } from '../../../lib/files.mjs';
+import { track, getCommonProps } from '../../../lib/telemetry.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SCRIPT_PATH = join(__dirname, '../../../scripts/review.mjs');
+const PACKAGE_ROOT = join(__dirname, '../../../..');
+
+/**
+ * Get package version from package.json.
+ */
+function getVersion() {
+  try {
+    const pkgPath = join(PACKAGE_ROOT, 'package.json');
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+    return pkg.version || '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+}
 
 /**
  * Parse review command arguments.
@@ -35,6 +50,9 @@ function parseArgs(args) {
         agentTimeout = parseInt(nextArg, 10) || 10;
         i++; // Skip next arg
       }
+    } else if (arg === '--no-telemetry') {
+      // Skip this flag - don't pass to script, but preserve for telemetry check
+      continue;
     } else if (!arg.startsWith('--agent')) {
       scriptArgs.push(arg);
       // First non-flag arg is the slug
@@ -71,6 +89,18 @@ function runReviewScript(args) {
  */
 export async function run(args) {
   const { slug, useAgent, agentTimeout, scriptArgs } = parseArgs(args);
+
+  // Track command execution (best-effort, non-blocking)
+  const version = getVersion();
+  const commonProps = getCommonProps(version);
+  
+  if (useAgent) {
+    // Track agent mode
+    track('cmd_review_agent', { ...commonProps, agent: true }, { args });
+  } else {
+    // Track regular review
+    track('cmd_review', { ...commonProps, agent: false }, { args });
+  }
 
   // Always run the review script first
   const exitCode = await runReviewScript(scriptArgs);

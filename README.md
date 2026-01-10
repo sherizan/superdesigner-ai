@@ -1,7 +1,5 @@
 # Superdesigner
 
-**Run this once**
-
 Superdesigner is a product reasoning workflow that runs inside Cursor, connecting PRDs, research, designs, and analytics to surface design gaps and blind spots before review, handoff, or launch.
 
 ---
@@ -143,6 +141,32 @@ superdesigner doctor
 ```
 
 This checks your setup and tells you what to fix.
+
+---
+
+## Usage analytics
+
+Superdesigner collects anonymous usage statistics to understand adoption and improve the tool.
+
+**What we collect:**
+- Command name (`init`, `review`)
+- CLI version
+- Operating system (e.g., `darwin`, `linux`, `win32`)
+- Node.js version
+
+**What we DON'T collect:**
+- No PRD content, file paths, or project names
+- No Figma links or design data
+- No personal or identifying information
+
+**Opt-out:**
+```bash
+# Via environment variable
+export SUPERDESIGNER_TELEMETRY=0
+
+# Or per-command
+superdesigner review my-project --no-telemetry
+```
 
 ---
 
