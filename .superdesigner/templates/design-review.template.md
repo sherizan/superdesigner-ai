@@ -110,6 +110,46 @@
 
 ---
 
+## Figma Make Prompts
+
+{Generate actionable prompts for creating/improving designs in Figma based on review findings}
+
+### Priority Improvements
+
+#### P0 Prompts
+{Generate prompts for blocking issues that need immediate design solutions}
+- **Prompt**: {Actionable prompt for Figma based on P0 findings}
+- **Context**: {Why this is critical, what state/flow it affects}
+- **Expected Output**: {What should be designed/updated}
+
+#### P1 Prompts
+{Generate prompts for high-impact improvements}
+- **Prompt**: {Actionable prompt for Figma based on P1 findings}
+- **Context**: {Why this improves the experience}
+- **Expected Output**: {What should be designed/updated}
+
+### Missing States & Edge Cases
+
+{Generate prompts for missing states identified in the review}
+- **Prompt**: {Prompt to design missing empty/loading/error states}
+- **Flow**: {Which flow this applies to}
+- **Requirements**: {Specific requirements from review}
+
+### Research-Driven Improvements
+
+{Generate prompts based on research findings that need design solutions}
+- **Prompt**: {Prompt addressing research finding}
+- **Research Context**: {Relevant finding from research}
+- **Design Solution**: {What needs to be designed}
+
+### Accessibility & Edge Case Prompts
+
+{Generate prompts for accessibility and edge case improvements}
+- **Prompt**: {Prompt for accessibility improvements}
+- **Prompt**: {Prompt for edge case handling}
+
+---
+
 ## Questions for Design Team
 
 {Numbered list of open questions that need answers}
