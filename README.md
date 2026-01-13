@@ -2,6 +2,10 @@
 
 Superdesigner is a product reasoning workflow that runs inside Cursor, connecting PRDs, research, designs, and analytics to surface design gaps and blind spots before review, handoff, or launch.
 
+## 🎥 Watch the demo
+
+[![Watch the video](https://img.youtube.com/vi/gDiNZKH5a5A/0.jpg)](https://youtu.be/gDiNZKH5a5A)
+
 ---
 
 ## Setup Guide
