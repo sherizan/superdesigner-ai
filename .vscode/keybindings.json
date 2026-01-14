@@ -1,0 +1,7 @@
+[
+  {
+    "key": "cmd+shift+m",
+    "command": "markdown.showPreviewToSide",
+    "when": "editorLangId == 'markdown'"
+  }
+]

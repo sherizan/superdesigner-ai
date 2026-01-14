@@ -1,0 +1,34 @@
+{
+  // Auto-open markdown files in preview mode by default
+  // This automatically shows formatted markdown when opening .md files
+  "workbench.editorAssociations": {
+    "**/insights/*.md": "vscode.markdown.preview.editor",
+    "**/design-review.md": "vscode.markdown.preview.editor",
+    "**/design-comments.preview.md": "vscode.markdown.preview.editor"
+  },
+  
+  // Native markdown preview settings
+  "markdown.preview.breaks": true,
+  "markdown.preview.linkify": true,
+  "markdown.preview.typographer": true,
+  "markdown.preview.fontSize": 14,
+  "markdown.preview.lineHeight": 1.6,
+  
+  // File associations to ensure proper markdown rendering
+  "files.associations": {
+    "**/insights/*.md": "markdown",
+    "**/design-review.md": "markdown",
+    "**/design-comments.preview.md": "markdown"
+  },
+  
+  // Editor settings for markdown files (when editing source)
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    },
+    "editor.formatOnSave": false
+  }
+}

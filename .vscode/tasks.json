@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Open Markdown Preview (Side-by-Side)",
+      "type": "shell",
+      "command": "echo 'Use Cmd+K V (Mac) or Ctrl+K V (Windows/Linux) to open preview side-by-side'",
+      "presentation": {
+        "reveal": "never",
+        "echo": true,
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
