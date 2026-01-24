@@ -114,39 +114,47 @@
 
 {Generate actionable prompts for creating/improving designs in Figma based on review findings}
 
+### Product Context
+
+**Product**: {project_name}  
+**Description**: {Brief 2-3 sentence description of what the product is, who it's for, and its core purpose}  
+**Key Features**: {List 3-5 main features and what they enable users to do}
+
+---
+
 ### Priority Improvements
 
 #### P0 Prompts
-{Generate prompts for blocking issues that need immediate design solutions}
-- **Prompt**: {Actionable prompt for Figma based on P0 findings}
+{Generate prompts for blocking issues that need immediate design solutions. Include product context in each prompt.}
+- **Prompt**: {Actionable prompt for Figma that includes product context, the specific issue, and what needs to be designed}
 - **Context**: {Why this is critical, what state/flow it affects}
 - **Expected Output**: {What should be designed/updated}
 
 #### P1 Prompts
-{Generate prompts for high-impact improvements}
-- **Prompt**: {Actionable prompt for Figma based on P1 findings}
+{Generate prompts for high-impact improvements. Include product context in each prompt.}
+- **Prompt**: {Actionable prompt for Figma that includes product context, the improvement opportunity, and what needs to be designed}
 - **Context**: {Why this improves the experience}
 - **Expected Output**: {What should be designed/updated}
 
 ### Missing States & Edge Cases
 
-{Generate prompts for missing states identified in the review}
-- **Prompt**: {Prompt to design missing empty/loading/error states}
+{Generate prompts for missing states identified in the review. Include product context in each prompt.}
+- **Prompt**: {Prompt to design missing empty/loading/error states, including product context and the specific flow}
 - **Flow**: {Which flow this applies to}
 - **Requirements**: {Specific requirements from review}
 
 ### Research-Driven Improvements
 
-{Generate prompts based on research findings that need design solutions}
-- **Prompt**: {Prompt addressing research finding}
+{Generate prompts based on research findings that need design solutions. Include product context in each prompt.}
+- **Prompt**: {Prompt addressing research finding, including product context and how it relates to user needs}
 - **Research Context**: {Relevant finding from research}
 - **Design Solution**: {What needs to be designed}
 
 ### Accessibility & Edge Case Prompts
 
-{Generate prompts for accessibility and edge case improvements}
-- **Prompt**: {Prompt for accessibility improvements}
-- **Prompt**: {Prompt for edge case handling}
+{Generate prompts for accessibility and edge case improvements. Include product context in each prompt.}
+- **Prompt**: {Prompt for accessibility improvements, including product context}
+- **Prompt**: {Prompt for edge case handling, including product context}
 
 ---
 
