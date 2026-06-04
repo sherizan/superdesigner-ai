@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Generate design review prompts for Cursor Agent.
+ * Generate design review prompts for the review agent (Claude Code; Cursor optional).
  * Usage: superdesigner review [project-slug]
  *        superdesigner review all
  */
@@ -41,15 +41,17 @@ Read the context files and generate design review insights.
 
 ## Figma Analysis (REQUIRED)
 
-**You MUST use Figma MCP tools to analyze the design:**
+**You MUST use the Figma Dev Mode MCP to analyze the design:**
 
 1. Read \`projects/${slug}/context/figma.md\` to get Figma URLs and node IDs
-2. For each Figma URL, use \`mcp_Figma_get_metadata\` to get the nested frame structure
-3. Use \`mcp_Figma_get_design_context\` on key screens to understand the design
+2. For each Figma URL, use \`mcp__figma__get_metadata\` to get the nested frame structure
+3. Use \`mcp__figma__get_design_context\` on key screens to understand the design
 4. Extract specific nodeIds for nested screens (not just parent frames)
 5. Use these specific nodeIds when generating design comments
 
 This ensures comments are pinned to the correct screens, not just parent frames.
+If the Figma MCP is unavailable, stop and ask for the Figma desktop app (with Dev Mode MCP
+enabled) rather than guessing node IDs.
 
 ## Output (write to these files)
 

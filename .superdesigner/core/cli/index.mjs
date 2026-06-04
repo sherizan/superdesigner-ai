@@ -92,7 +92,7 @@ function getVersion() {
  */
 function printUsage() {
   console.log(`
-superdesigner - A lean design review workflow for Cursor
+superdesigner - A lean design review workflow for Claude Code (pairs with Cursor)
 
 Usage:
   superdesigner <command> [options]
@@ -109,7 +109,9 @@ Options:
   --no-telemetry   Disable anonymous usage telemetry
 
 Review Options:
-  --agent                  Run Cursor Agent after generating prompts
+  --agent                  Run the agent after generating prompts (Claude Code by default)
+  --cursor                 Use the Cursor agent instead of Claude Code (with --agent)
+  --model <name>           Model override for Claude Code (e.g. claude-opus-4-6)
   --agent-timeout <min>    Agent timeout in minutes (default: 10)
 
 Examples:
@@ -117,8 +119,11 @@ Examples:
   superdesigner review my-project
   superdesigner review my-project --agent
   superdesigner review my-project --agent --agent-timeout 15
+  superdesigner review my-project --agent --cursor
   superdesigner comment my-project --dry-run
   superdesigner doctor
+
+In Claude Code, you can also run the review interactively:  /review my-project
 
 Telemetry:
   Anonymous usage stats (command, version, OS) are collected to improve

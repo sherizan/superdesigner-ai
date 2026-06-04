@@ -1,6 +1,6 @@
 # Superdesigner
 
-Superdesigner is a product reasoning workflow that runs inside Cursor, connecting PRDs, research, designs, and analytics to surface design gaps and blind spots before review, handoff, or launch.
+Superdesigner is a product reasoning workflow that runs on Claude Code, connecting PRDs, research, designs, and analytics to surface design gaps and blind spots before review, handoff, or launch. Cursor stays your editor and filesystem; Claude Code is the agent that does the review. The two pair.
 
 ## 🎥 Watch the demo
 
@@ -14,7 +14,9 @@ Superdesigner is a product reasoning workflow that runs inside Cursor, connectin
 
 You'll need:
 - **Node.js 18+** — [Download here](https://nodejs.org) if you don't have it
-- **Cursor** — [Download here](https://cursor.com) (free)
+- **Claude Code** — the review agent ([install guide](https://code.claude.com/docs/en/overview))
+- **Cursor** — [Download here](https://cursor.com) (free), your editor and filesystem
+- **Figma desktop app** with Dev Mode MCP enabled (for pinning comments to real screens)
 
 To check your Node version:
 ```bash
@@ -38,18 +40,20 @@ npm install && npm link
 
 This installs dependencies and lets you run `superdesigner` from anywhere.
 
-### Step 4: Install Cursor CLI (optional)
+### Step 4: Set up Claude Code
 
-To use `--agent` mode (automated reviews), install and authenticate the Cursor CLI:
+To use `--agent` mode (automated reviews), install Claude Code and sign in:
 
 ```bash
-curl https://cursor.com/install -fsS | bash
-agent login
+npm install -g @anthropic-ai/claude-code
+claude   # run once to sign in
 ```
 
-Or from Cursor: `Cmd+Shift+P` → "Install 'agent' command", then run `agent login` in terminal.
+The Figma MCP is already wired up in `.mcp.json` (the official Figma Dev Mode MCP). Just open the
+Figma desktop app with Dev Mode MCP enabled before you run a review.
 
-Skip this if you prefer running prompts manually in Cursor.
+**Prefer Cursor?** Install the Cursor CLI (`curl https://cursor.com/install -fsS | bash`, then
+`agent login`) and add `--cursor` to the review command. Or skip both and run the prompt manually.
 
 ### Step 5: Verify it works
 
@@ -74,9 +78,10 @@ superdesigner init "Checkout Flow"
 superdesigner review checkout-flow --agent
 ```
 
-The `--agent` flag runs Cursor automatically to generate your review.
+The `--agent` flag runs Claude Code automatically to generate your review.
 
-**Without Cursor CLI?** Run without `--agent`, then open the generated prompt in Cursor manually.
+**Inside Claude Code?** Open this repo and run `/review checkout-flow` instead.
+**Prefer Cursor?** Add `--cursor`, or run without `--agent` and open the prompt in Cursor manually.
 
 ---
 
@@ -100,8 +105,10 @@ context/figma.md
 | Command | What it does |
 |---------|--------------|
 | `superdesigner init "Name"` | Create a new project |
-| `superdesigner review <project>` | Generate design review |
-| `superdesigner review <project> --agent` | Generate and run with Cursor Agent |
+| `superdesigner review <project>` | Generate design review prompts |
+| `superdesigner review <project> --agent` | Generate and run with Claude Code |
+| `superdesigner review <project> --agent --cursor` | Run with the Cursor agent instead |
+| `/review <project>` | Run the review inside Claude Code (interactive) |
 | `superdesigner comment <project>` | Post comments to Figma |
 | `superdesigner doctor` | Check if everything is set up |
 
@@ -177,8 +184,9 @@ superdesigner review my-project --no-telemetry
 ## Requirements
 
 - Node.js 18 or later
-- [Cursor](https://cursor.com) (for running the generated prompts)
-- [Cursor CLI](https://cursor.com/docs/cli/headless) (optional, for `--agent` mode)
+- [Claude Code](https://code.claude.com/docs/en/overview) (the review agent, for `--agent` mode and `/review`)
+- [Figma Dev Mode MCP](https://help.figma.com/hc/en-us/articles/32132100833559) (desktop app, for screen-level comments)
+- [Cursor](https://cursor.com) (your editor; add `--cursor` to run its agent instead)
 - Figma account (optional, for posting comments)
 
 ---

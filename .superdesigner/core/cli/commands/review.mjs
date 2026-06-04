@@ -1,7 +1,7 @@
 /**
  * Review command - generates design review prompts.
  * Delegates to scripts/review.mjs via spawn.
- * Optionally runs Cursor Agent with --agent flag.
+ * Optionally runs the agent with --agent (Claude Code by default; --cursor for Cursor).
  */
 
 import { spawn } from 'child_process';
@@ -31,11 +31,13 @@ function getVersion() {
 /**
  * Parse review command arguments.
  * @param {string[]} args - Raw command arguments
- * @returns {{slug: string|null, useAgent: boolean, agentTimeout: number, scriptArgs: string[]}}
+ * @returns {{slug: string|null, useAgent: boolean, useCursor: boolean, agentTimeout: number, model: string|null, scriptArgs: string[]}}
  */
 function parseArgs(args) {
   let useAgent = false;
+  let useCursor = false;
   let agentTimeout = 10;
+  let model = null;
   const scriptArgs = [];
   let slug = null;
 
@@ -44,10 +46,19 @@ function parseArgs(args) {
 
     if (arg === '--agent') {
       useAgent = true;
+    } else if (arg === '--cursor') {
+      // Opt back into the Cursor agent (the pairing); Claude Code is the default.
+      useCursor = true;
     } else if (arg === '--agent-timeout') {
       const nextArg = args[i + 1];
       if (nextArg && !nextArg.startsWith('-')) {
         agentTimeout = parseInt(nextArg, 10) || 10;
+        i++; // Skip next arg
+      }
+    } else if (arg === '--model') {
+      const nextArg = args[i + 1];
+      if (nextArg && !nextArg.startsWith('-')) {
+        model = nextArg;
         i++; // Skip next arg
       }
     } else if (arg === '--no-telemetry') {
@@ -62,7 +73,7 @@ function parseArgs(args) {
     }
   }
 
-  return { slug, useAgent, agentTimeout, scriptArgs };
+  return { slug, useAgent, useCursor, agentTimeout, model, scriptArgs };
 }
 
 /**
@@ -88,17 +99,16 @@ function runReviewScript(args) {
  * @returns {Promise<void>}
  */
 export async function run(args) {
-  const { slug, useAgent, agentTimeout, scriptArgs } = parseArgs(args);
+  const { slug, useAgent, useCursor, agentTimeout, model, scriptArgs } = parseArgs(args);
+  const agentName = useCursor ? 'Cursor' : 'Claude Code';
 
   // Track command execution (best-effort, non-blocking)
   const version = getVersion();
   const commonProps = getCommonProps(version);
-  
+
   if (useAgent) {
-    // Track agent mode
-    track('cmd_review_agent', { ...commonProps, agent: true }, { args });
+    track('cmd_review_agent', { ...commonProps, agent: true, runner: useCursor ? 'cursor' : 'claude' }, { args });
   } else {
-    // Track regular review
     track('cmd_review', { ...commonProps, agent: false }, { args });
   }
 
@@ -111,14 +121,11 @@ export async function run(args) {
 
   // If --agent flag is not passed, show manual next steps
   if (!useAgent) {
-    console.log('📝 Next step:');
-    if (slug && slug !== 'all') {
-      console.log(`   Run: superdesigner review ${slug} --agent`);
-    } else {
-      console.log('   Run: superdesigner review <project> --agent');
-    }
-    console.log('');
-    console.log('   Or manually: open _review_prompt.md in Cursor → Cmd+I → Agent mode');
+    const target = slug && slug !== 'all' ? slug : '<project>';
+    console.log('📝 Next step, pick one:');
+    console.log(`   • In Claude Code (this repo):  /review ${target}`);
+    console.log(`   • Headless:                    superdesigner review ${target} --agent`);
+    console.log('   • In Cursor (manual):          open _review_prompt.md → Cmd+I → Agent mode');
     console.log('');
     return;
   }
@@ -147,40 +154,48 @@ export async function run(args) {
     process.exit(1);
   }
 
-  // Import and run the cursor-agent integration
-  const { runCursorAgent, isCursorAgentAvailable, printMissingAgentInstructions, printAuthInstructions } = 
-    await import('../../integrations/cursor-agent.mjs');
+  // Load the chosen integration: Claude Code by default, Cursor on --cursor.
+  const integration = useCursor
+    ? await import('../../integrations/cursor-agent.mjs')
+    : await import('../../integrations/claude-code.mjs');
 
-  // Check if cursor-agent is available
-  const available = await isCursorAgentAvailable();
+  const isAvailable = useCursor ? integration.isCursorAgentAvailable : integration.isClaudeCodeAvailable;
+  const printMissing = useCursor ? integration.printMissingAgentInstructions : integration.printMissingClaudeInstructions;
+  const printAuth = integration.printAuthInstructions;
+  const runAgent = useCursor ? integration.runCursorAgent : integration.runClaudeCode;
+
+  // Check availability
+  const available = await isAvailable();
   if (!available) {
-    printMissingAgentInstructions();
-    console.log(`📄 Prompt file ready at:`);
+    printMissing();
+    console.log('📄 Prompt file ready at:');
     console.log(`   ${promptPath}`);
     console.log('');
     return;
   }
 
-  // Run the agent
-  const result = await runCursorAgent({
+  // Run the agent. Claude Code runs from the workspace root so that
+  // projects/<slug>/..., .cursor/rules/... and .superdesigner/templates/... resolve.
+  const result = await runAgent({
     promptPath,
-    workingDir: projectPath,
-    timeoutMinutes: agentTimeout
+    workingDir: useCursor ? projectPath : workspaceRoot,
+    timeoutMinutes: agentTimeout,
+    ...(useCursor ? {} : { model, mcpConfigPath: join(workspaceRoot, '.mcp.json') })
   });
 
   if (!result.success) {
-    // Check if it's an auth error
+    // Check if it's likely an auth error (exit code 1)
     if (result.error && result.error.includes('code 1')) {
-      printAuthInstructions();
+      printAuth();
       console.log('📄 Prompt file ready at:');
       console.log(`   ${promptPath}`);
       console.log('');
-      console.log('After logging in, run again:');
-      console.log(`   superdesigner review ${slug} --agent`);
+      console.log('After signing in, run again:');
+      console.log(`   superdesigner review ${slug} --agent${useCursor ? ' --cursor' : ''}`);
       console.log('');
     } else {
       console.error('');
-      console.error(`❌ Agent failed: ${result.error}`);
+      console.error(`❌ ${agentName} failed: ${result.error}`);
       console.error('');
     }
     process.exit(1);
@@ -196,7 +211,7 @@ export async function run(args) {
     console.log(`   2. Run: superdesigner comment ${slug} --dry-run`);
     console.log('');
   } else {
-    console.log('⚠️  Agent completed but design-review.md was not found.');
+    console.log(`⚠️  ${agentName} completed but design-review.md was not found.`);
     console.log('   Try running again or check the prompt file manually.');
   }
   console.log('');

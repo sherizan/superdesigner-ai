@@ -98,8 +98,41 @@ function checkTemplates() {
 }
 
 /**
+ * Check if the Claude Code CLI is available.
+ * The command is "claude". This is the default review agent.
+ * @returns {Promise<{ok: boolean, message: string, fix?: string}>}
+ */
+async function checkClaudeCode() {
+  return new Promise((resolve) => {
+    const child = spawn('which', ['claude'], {
+      stdio: ['ignore', 'pipe', 'ignore']
+    });
+
+    child.on('close', (code) => {
+      const available = code === 0;
+      resolve({
+        ok: true, // Informational, not a hard failure
+        message: available
+          ? 'Claude Code CLI available (claude)'
+          : 'Claude Code CLI not found (needed for --agent)',
+        fix: available ? null : 'Run: npm install -g @anthropic-ai/claude-code'
+      });
+    });
+
+    child.on('error', () => {
+      resolve({
+        ok: true,
+        message: 'Claude Code CLI not found (needed for --agent)',
+        fix: 'Run: npm install -g @anthropic-ai/claude-code'
+      });
+    });
+  });
+}
+
+/**
  * Check if Cursor Agent CLI is available.
- * The command is "agent" (installed via Cursor > Command Palette > Install 'agent' command)
+ * The command is "agent" (installed via Cursor > Command Palette > Install 'agent' command).
+ * Optional: only used when running --agent --cursor.
  * @returns {Promise<{ok: boolean, message: string, fix?: string}>}
  */
 async function checkCursorAgent() {
@@ -173,6 +206,13 @@ export async function run(args) {
   }
 
   // Run async checks
+  const claudeResult = await checkClaudeCode();
+  const claudeIcon = claudeResult.message.includes('available') ? '✅' : 'ℹ️';
+  console.log(`  ${claudeIcon} Claude Code: ${claudeResult.message}`);
+  if (!claudeResult.message.includes('available') && claudeResult.fix) {
+    console.log(`     💡 ${claudeResult.fix}`);
+  }
+
   const cursorAgentResult = await checkCursorAgent();
   const agentIcon = cursorAgentResult.message.includes('available') ? '✅' : 'ℹ️';
   console.log(`  ${agentIcon} Cursor Agent: ${cursorAgentResult.message}`);
