@@ -113,11 +113,21 @@ Review Options:
   --cursor                 Use the Cursor agent instead of Claude Code (with --agent)
   --model <name>           Model override for Claude Code (e.g. claude-opus-4-6)
   --agent-timeout <min>    Agent timeout in minutes (default: 10)
+  --intent <type>          Review intent: pre-handoff | pre-launch | gap-audit
+                           (omit to let the agent infer it from the context)
+  --scaffold <path>        When there's no Figma file, build a starting point from the PRD:
+                           figma (frames on canvas) | code (HTML prototype)
+                           (omit to let the agent choose or ask)
+  --workflow               Run a review through the deterministic dynamic-workflow orchestrator
+                           (parallel agents + schema-validated findings + code-side synthesis)
 
 Examples:
   superdesigner init "My Project"
   superdesigner review my-project
   superdesigner review my-project --agent
+  superdesigner review my-project --intent pre-launch --agent
+  superdesigner review my-project --scaffold code --agent   # no Figma yet → build from PRD
+  superdesigner review my-project --workflow --agent         # deterministic workflow orchestrator
   superdesigner review my-project --agent --agent-timeout 15
   superdesigner review my-project --agent --cursor
   superdesigner comment my-project --dry-run

@@ -8,7 +8,8 @@ import { spawn } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { findWorkspaceRoot } from '../../../lib/files.mjs';
+import { findWorkspaceRoot, readFile } from '../../../lib/files.mjs';
+import { hasFigmaTarget } from '../../../lib/figma.mjs';
 import { track, getCommonProps } from '../../../lib/telemetry.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -61,6 +62,23 @@ function parseArgs(args) {
         model = nextArg;
         i++; // Skip next arg
       }
+    } else if (arg === '--intent') {
+      // Forward the review intent to the review script (it builds the prompt).
+      const nextArg = args[i + 1];
+      if (nextArg && !nextArg.startsWith('-')) {
+        scriptArgs.push('--intent', nextArg);
+        i++; // Skip next arg
+      }
+    } else if (arg === '--scaffold') {
+      // Forward the scaffold path (figma|code) to the review script.
+      const nextArg = args[i + 1];
+      if (nextArg && !nextArg.startsWith('-')) {
+        scriptArgs.push('--scaffold', nextArg);
+        i++; // Skip next arg
+      }
+    } else if (arg === '--workflow') {
+      // Route a review through the deterministic dynamic workflow.
+      scriptArgs.push('--workflow');
     } else if (arg === '--no-telemetry') {
       // Skip this flag - don't pass to script, but preserve for telemetry check
       continue;
@@ -145,6 +163,13 @@ export async function run(args) {
   const insightsPath = join(projectPath, 'insights');
   const promptPath = join(insightsPath, 'prompts', '_review_prompt.md');
   const designReviewPath = join(insightsPath, 'design-review.md');
+  const screenPlanPath = join(insightsPath, 'screen-plan.md');
+  const prototypePath = join(projectPath, 'prototype');
+
+  // No Figma target + a PRD → the script generated a scaffold prompt, not a review.
+  const figmaContent = readFile(join(projectPath, 'context', 'figma.md'));
+  const prdContent = readFile(join(projectPath, 'context', 'prd.md'));
+  const isScaffold = !hasFigmaTarget(figmaContent) && Boolean(prdContent);
 
   if (!existsSync(promptPath)) {
     console.error('');
@@ -201,9 +226,26 @@ export async function run(args) {
     process.exit(1);
   }
 
-  // Verify design-review.md was created in insights/
+  // Verify the expected output and show mode-specific next steps.
   console.log('');
-  if (existsSync(designReviewPath)) {
+  if (isScaffold) {
+    if (existsSync(screenPlanPath)) {
+      console.log('✅ Scaffold complete!');
+      console.log('');
+      console.log('📝 Next steps:');
+      console.log(`   1. Review the screen plan: projects/${slug}/insights/screen-plan.md`);
+      if (existsSync(prototypePath)) {
+        console.log(`   2. Open the prototype: projects/${slug}/prototype/index.html`);
+      } else {
+        console.log(`   2. Check the new starter frames in your open Figma file`);
+      }
+      console.log(`   3. Once you have a design, add its link to context/figma.md and run a review`);
+      console.log('');
+    } else {
+      console.log(`⚠️  ${agentName} completed but screen-plan.md was not found.`);
+      console.log('   Try running again or check the prompt file manually.');
+    }
+  } else if (existsSync(designReviewPath)) {
     console.log('✅ Review complete!');
     console.log('');
     console.log('📝 Next steps:');

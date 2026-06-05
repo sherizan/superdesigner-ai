@@ -6,33 +6,12 @@
  */
 
 import { join } from 'path';
-import { readFile, projectExists, getContextPath, getInsightsPath, listProjectDirs } from '../lib/files.mjs';
+import { readFile, writeFile, projectExists, getContextPath, getInsightsPath, getMemoryPath, listProjectDirs } from '../lib/files.mjs';
 import { selectProject } from '../lib/prompt.mjs';
+import { extractFileKey } from '../lib/figma.mjs';
 
 const FIGMA_API_BASE = 'https://api.figma.com/v1';
 const MAX_COMMENTS = 10;
-
-/**
- * Extract Figma file key from figma.md content.
- * Supports URL formats and explicit FileKey: lines.
- * @param {string} content - Content of figma.md
- * @returns {string|null} - File key or null if not found
- */
-function extractFileKey(content) {
-  // Try URL patterns: figma.com/file/<KEY>/ or figma.com/design/<KEY>/
-  const urlMatch = content.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/);
-  if (urlMatch) {
-    return urlMatch[1];
-  }
-  
-  // Try explicit FileKey: line
-  const keyMatch = content.match(/^FileKey:\s*([a-zA-Z0-9]+)/m);
-  if (keyMatch) {
-    return keyMatch[1];
-  }
-  
-  return null;
-}
 
 /**
  * Parse comments from design-comments.preview.md (canonical format).
@@ -52,6 +31,7 @@ function parseComments(content) {
       frame: null,
       nodeId: null,
       type: null,
+      status: null,
       message: null,
       why: null
     };
@@ -82,6 +62,16 @@ function parseComments(content) {
     const typeMatch = block.match(/^Type:\s*\n\s*(.+)$/m);
     if (typeMatch) {
       comment.type = typeMatch[1].trim();
+    }
+
+    // Extract Status (feedback marker). Supports inline "Status: dismissed" or an indented value
+    // on the next line. Blank or template placeholder ("{...}") is treated as accepted (null).
+    const statusMatch = block.match(/^Status:\s*\n\s*(.+)$/m) || block.match(/^Status:\s*(.+)$/m);
+    if (statusMatch) {
+      const raw = statusMatch[1].trim().toLowerCase();
+      if (['accepted', 'overridden', 'dismissed'].includes(raw)) {
+        comment.status = raw;
+      }
     }
     
     // Extract Message (multi-line: everything between "Message:" and "Why:")
@@ -259,6 +249,63 @@ async function getTargetSlug(args) {
   return await selectProject(projects);
 }
 
+/**
+ * Record the designer's accept/override/dismiss decisions for observability and the memory
+ * feedback loop. Updates insights/run-manifest.json and appends a note to memory/session.md so
+ * the next review can learn from dismissals.
+ * @param {string} slug - Project slug
+ * @param {Array} parsed - Parsed comments (each with optional .status)
+ * @returns {{accepted: number, overridden: number, dismissed: number, total: number}}
+ */
+function recordFeedback(slug, parsed) {
+  const tally = { accepted: 0, overridden: 0, dismissed: 0, total: parsed.length };
+  const dismissed = [];
+  for (const c of parsed) {
+    const status = c.status || 'accepted';
+    if (status === 'overridden') tally.overridden++;
+    else if (status === 'dismissed') { tally.dismissed++; dismissed.push(c); }
+    else tally.accepted++;
+  }
+
+  const stamp = new Date().toISOString();
+
+  // Merge into the existing run manifest (or create a minimal one).
+  const manifestPath = join(getInsightsPath(slug), 'run-manifest.json');
+  let manifest = {};
+  const existing = readFile(manifestPath);
+  if (existing) {
+    try { manifest = JSON.parse(existing); } catch { manifest = {}; }
+  }
+  manifest.feedback = {
+    recordedAt: stamp,
+    accepted: tally.accepted,
+    overridden: tally.overridden,
+    dismissed: tally.dismissed,
+    total: tally.total,
+    dismissedComments: dismissed.map(c => ({
+      type: c.type,
+      page: c.page,
+      summary: (c.message || '').split('\n')[0]
+    }))
+  };
+  writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+
+  // Append to session memory so the next review sees what was dismissed.
+  const sessionPath = join(getMemoryPath(slug), 'session.md');
+  const prior = readFile(sessionPath) || '# Session memory\n';
+  let note = `\n## Feedback on posted comments (${stamp})\n\n` +
+    `- Accepted: ${tally.accepted} · Overridden: ${tally.overridden} · Dismissed: ${tally.dismissed} (of ${tally.total})\n`;
+  if (dismissed.length) {
+    note += `- Dismissed (consider not re-raising next review):\n`;
+    for (const c of dismissed) {
+      note += `  - [${c.type || 'Comment'}] ${(c.message || '').split('\n')[0]}\n`;
+    }
+  }
+  writeFile(sessionPath, prior + note);
+
+  return tally;
+}
+
 // Parse command line args
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
@@ -326,16 +373,26 @@ console.log(`File key: ${fileKey}`);
 console.log(`Comments: ${comments.length}`);
 console.log('');
 
+// Comments marked dismissed are skipped when posting.
+const postable = comments.filter(c => c.status !== 'dismissed');
+const dismissedCount = comments.length - postable.length;
+if (dismissedCount > 0) {
+  console.log(`(${dismissedCount} marked dismissed — will be skipped)`);
+  console.log('');
+}
+
 // Dry run mode
 if (dryRun) {
   console.log('🔍 DRY RUN - Comments that would be posted:');
   console.log('');
   comments.forEach((comment, i) => {
-    const target = comment.frame 
-      ? `${comment.page} → ${comment.frame}` 
+    const target = comment.frame
+      ? `${comment.page} → ${comment.frame}`
       : comment.page;
     const nodeInfo = comment.nodeId ? ` (node: ${comment.nodeId})` : ' (file level)';
-    console.log(`  ${i + 1}. [${comment.type}] @ ${target}${nodeInfo}`);
+    const skip = comment.status === 'dismissed' ? ' — SKIPPED (dismissed)' : '';
+    const tag = comment.status === 'overridden' ? ' [overridden]' : '';
+    console.log(`  ${i + 1}. [${comment.type}] @ ${target}${nodeInfo}${tag}${skip}`);
     console.log(`     ${comment.message.split('\n')[0]}`);
     if (comment.why) {
       console.log(`     📎 ${comment.why}`);
@@ -367,7 +424,7 @@ let failCount = 0;
 // Track offset per nodeId so comments on same node don't overlap
 const nodeOffsets = new Map();
 
-for (const comment of comments) {
+for (const comment of postable) {
   const formatted = formatCommentForFigma(comment);
   
   // Get current offset for this nodeId (or 0 if first comment on this node)
@@ -395,8 +452,15 @@ console.log('');
 if (failCount === 0) {
   console.log(`✅ Posted ${successCount} comments to ${fileKey}`);
 } else {
-  console.log(`⚠️  Posted ${successCount}/${comments.length} comments (${failCount} failed)`);
+  console.log(`⚠️  Posted ${successCount}/${postable.length} comments (${failCount} failed)`);
 }
+
+// Record the designer's accept/override/dismiss decisions (observability + memory feedback loop).
+const tally = recordFeedback(slug, comments);
+console.log('');
+console.log(`🧠 Feedback recorded: ${tally.accepted} accepted · ${tally.overridden} overridden · ${tally.dismissed} dismissed`);
+console.log('   → insights/run-manifest.json, memory/session.md');
+
 console.log('');
 console.log('View comments in Figma:');
 console.log(`  https://www.figma.com/file/${fileKey}`);

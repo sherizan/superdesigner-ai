@@ -13,6 +13,9 @@ Target:
 Type:
   {Missing State | Flow Mismatch | Clarifying Question | Edge Case | Validation}
 
+Status:
+  {leave blank, or set to accepted | overridden | dismissed before posting}
+
 Message:
 {Multi-line prose describing the issue, question, or gap.
 Include context about what's expected vs. what's observed.}
@@ -38,3 +41,15 @@ Why:
 - Comments with `nodeId` are pinned to that specific frame/section in Figma
 - Comments without `nodeId` are posted at file level
 - You can manually override `nodeId` for individual comments if needed
+
+## Status (feedback loop)
+
+Before posting, mark each comment so Superdesigner learns from your decisions:
+
+- **accepted** — you agree; it posts to Figma.
+- **overridden** — you'll handle it differently; it posts, and the override is recorded.
+- **dismissed** — not useful; it is skipped (not posted).
+- *(blank)* — treated as accepted.
+
+`superdesigner comment` tallies these and records them so future reviews can stop re-raising what
+you consistently dismiss.

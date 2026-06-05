@@ -39,8 +39,10 @@ It helps designers and design leaders:
 - Review designs with full context
 - Catch risks before launch
 
-**Superdesigner does not generate UI.  
-It reviews intent, structure, and completeness.**
+**Superdesigner reasons about intent, structure, and completeness.**  
+With a design, it reviews intent. With a PRD but no design yet, it scaffolds a first-draft starting
+point from intent (proposed screens, and either Figma frames or an HTML prototype) — to solve the
+blank-canvas problem. It is not a polished-UI generator; the scaffold is a draft to react to.
 
 ---
 
@@ -75,7 +77,7 @@ It reviews intent, structure, and completeness.**
 
 ## 5. What Superdesigner Is Not
 
-- ❌ Not a UI generation tool
+- ❌ Not a polished-UI generator (scaffolding produces first-draft starting points, not final designs)
 - ❌ Not a Figma replacement
 - ❌ Not a design system manager
 - ❌ Not a SaaS dashboard (for now)
@@ -115,11 +117,13 @@ Validate one habit:
 - Single command to run a review
 - Output: `design-review.md`
 - Optional posting of comments back to Figma
+- Scaffold mode: when there's a PRD but no Figma file, propose screens and build a starting point
+  (Figma frames or an HTML prototype)
 
 ### Excluded
 - SaaS UI
 - Mac app
-- Auto UI generation
+- Polished/production UI generation (scaffold output is a first draft, not a finished design)
 - Heavy dashboards
 
 ---
@@ -127,7 +131,7 @@ Validate one habit:
 ## 9. Core Commands
 
 ```bash
-superdesigner init "Name"    # scaffold a new project
-superdesigner review <slug>  # generate design-review.md
+superdesigner init "Name"    # create a new project
+superdesigner review <slug>  # review the design — or scaffold screens from the PRD if no Figma yet
 superdesigner comment <slug> # post selected comments to Figma
 superdesigner doctor         # check system requirements

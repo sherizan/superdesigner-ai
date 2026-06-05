@@ -210,3 +210,14 @@ export function getContextPath(slug) {
 export function getInsightsPath(slug) {
   return join(findWorkspaceRoot(), 'projects', slug, 'insights');
 }
+
+/**
+ * Get the absolute path to a project's memory folder.
+ * Holds what carries across reviews: session (last run), project (durable facts),
+ * and user preferences (the designer's recurring choices).
+ * @param {string} slug - Project slug
+ * @returns {string} - Absolute path to memory folder
+ */
+export function getMemoryPath(slug) {
+  return join(findWorkspaceRoot(), 'projects', slug, 'memory');
+}

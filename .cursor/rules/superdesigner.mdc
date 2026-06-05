@@ -1,10 +1,36 @@
 # Superdesigner Review Rules
 
-**Superdesigner reviews intent, not pixels.**
+**Superdesigner reasons about intent, not pixels.** With a design, it *reviews* intent. With a PRD
+but no design yet, it *scaffolds* a starting point from intent.
 
-## Figma MCP (REQUIRED)
+## Two modes
 
-**You MUST use Figma MCP tools to analyze designs:**
+- **Review** (a Figma file is present in `figma.md`) — run the multi-agent design review below.
+- **Scaffold** (a PRD but no Figma target in `figma.md`) — propose the screens from the PRD and
+  build a starting point: either Figma canvas frames (figma-console MCP) or a single-file HTML
+  prototype. Still intent-first — every proposed screen traces to a PRD step; this is a first draft
+  to react to, not a finished, pixel-perfect design. The engine selects the mode automatically by
+  checking `figma.md` for a real Figma link/node.
+
+## Review intent
+
+Decide what kind of review to run before anything else — it routes what you check and how you
+weight findings:
+
+- **pre-handoff** — before engineering handoff. Weight flow clarity, the five states, and PRD
+  coverage. Focus on what's missing or ambiguous, not launch-readiness.
+- **pre-launch** — final gate. Weight analytics instrumentation, error/recovery states, edge
+  cases, and trust signals. Surface launch-blocking gaps as P0.
+- **gap-audit** — weight PRD-to-design coverage and missing states/edge cases. List every PRD
+  requirement with no corresponding screen or state.
+
+If the intent isn't given, infer it: sparse/early PRD + early Figma → pre-handoff; complete PRD
+with analytics defined → pre-launch; a "what are we missing" framing → gap-audit. State the
+intent you used at the top of the review.
+
+## Figma MCP (optional, recommended)
+
+**If the Figma Dev Mode MCP is connected, use it to analyze designs:**
 
 1. Read `projects/<slug>/context/figma.md` to get Figma URLs
 2. Extract fileKey and nodeId from each URL
@@ -14,14 +40,24 @@
 
 This ensures comments are pinned to specific screens in Figma, not just parent frames.
 
+**If the Figma MCP is not connected, do not stop.** Run the rest of the review against the
+`figma.md` text (URLs, node IDs, screen notes) plus the PRD, research, analytics, and content
+sources. Note in the review that live Figma inspection was skipped, and that screen-level node
+IDs in comments are taken from `figma.md` rather than verified against the file. A review without
+Figma inspection is still more rigorous than no review.
+
 ## File Access Contract
 
 ### READ ONLY
-- `projects/<slug>/context/*` - User-provided context files
+- `projects/<slug>/context/*` - User-provided context files (prd, research, figma, analytics, content, optional per-project DESIGN.md)
+- `DESIGN.md` - Workspace-root design reference ("what good means"); the UX and content findings cite its rules
 - `.superdesigner/templates/*` - Output format templates
 
 ### WRITE ONLY
-- `projects/<slug>/insights/*` - Generated review outputs
+- `projects/<slug>/insights/*` - Generated review/scaffold outputs (incl. `screen-plan.md`, `run-manifest.json`)
+- `projects/<slug>/prototype/*` - Scaffold code prototype (HTML), when the code path is used
+- `projects/<slug>/memory/session.md` and `projects/<slug>/memory/project.md` - Updated after a run
+  (do NOT write `user-preferences.md` — the designer owns it)
 
 ### DO NOT MODIFY
 - `.superdesigner/` - Engine code (except reading templates)
@@ -72,6 +108,24 @@ Key sections:
 - Does each PRD step have a screen?
 - Are all goals addressed?
 - Are edge cases covered?
+
+### Content & Copy
+- Do labels and CTAs match the content brief (`content.md`) and DESIGN.md voice?
+- Are irreversible/high-stakes actions stated in plain language with their consequence?
+- Does every error and empty state have microcopy and a recovery action?
+- Is legal/compliance copy restated in plain English where required?
+
+## Guardrails
+
+These make the review trustworthy. Apply them to every finding before it ships:
+
+1. **Input completeness.** If a context file is missing or still the empty template, flag it
+   ("PRD is missing — this review is partial") rather than inventing requirements to fill the gap.
+2. **Evidence or it doesn't ship.** Every finding cites its source — a PRD step, a research line,
+   a DESIGN.md rule, an analytics number, or a Figma node. "This label is unclear" without a
+   citation does not ship; "This label contradicts the plain-language rule in DESIGN.md §3" does.
+3. **Questions, not verdicts.** Frame findings as questions ("Have you considered the empty state
+   when the user has no transaction history?"), not commands ("Add an empty state").
 
 ## Tone
 

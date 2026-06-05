@@ -12,16 +12,25 @@ import { join } from 'path';
 
 const DEFAULT_TIMEOUT_MINUTES = 10;
 
-// Tools the review agent needs: read context, write the two insight files,
-// and the Figma Dev Mode MCP tools (server name `figma` in .mcp.json).
+// Tools the review/scaffold agent needs: dispatch the scoped subagents (Task), read context,
+// write outputs, the read-only Figma Dev Mode MCP tools (server `figma`), and the figma-console
+// MCP tools (server `figma-console`) for building starter frames in scaffold mode. Per-agent tool
+// scoping is enforced by each subagent's `tools` frontmatter in .claude/agents/*.md; this
+// session-wide list is the union those subagents draw from.
 const ALLOWED_TOOLS = [
+  'Task',
+  'Workflow',
   'Read',
   'Write',
   'Edit',
   'Glob',
   'Grep',
   'mcp__figma__get_metadata',
-  'mcp__figma__get_design_context'
+  'mcp__figma__get_design_context',
+  'mcp__figma-console__figma_get_status',
+  'mcp__figma-console__figma_search_components',
+  'mcp__figma-console__figma_execute',
+  'mcp__figma-console__figma_take_screenshot'
 ].join(',');
 
 /**

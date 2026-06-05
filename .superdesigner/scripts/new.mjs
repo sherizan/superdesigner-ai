@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { slugify } from '../lib/slugify.mjs';
-import { copyTemplate, getProjectPath, getContextPath, getInsightsPath, writeFile } from '../lib/files.mjs';
+import { copyTemplate, getProjectPath, getContextPath, getInsightsPath, getMemoryPath, writeFile } from '../lib/files.mjs';
 
 // Get project name from command line args
 const args = process.argv.slice(2);
@@ -43,9 +43,11 @@ mkdirSync(projectPath, { recursive: true });
 
 const contextPath = getContextPath(slug);
 const insightsPath = getInsightsPath(slug);
+const memoryPath = getMemoryPath(slug);
 
 mkdirSync(contextPath, { recursive: true });
 mkdirSync(insightsPath, { recursive: true });
+mkdirSync(memoryPath, { recursive: true });
 
 // Meta values for template headers
 const meta = {
@@ -58,7 +60,8 @@ const templates = [
   ['prd.template.md', 'prd.md'],
   ['research.template.md', 'research.md'],
   ['figma.template.md', 'figma.md'],
-  ['analytics.template.md', 'analytics.md']
+  ['analytics.template.md', 'analytics.md'],
+  ['content.template.md', 'content.md']
 ];
 
 // Copy each template to context/
@@ -90,6 +93,7 @@ const contextReadme = `# Context
 - **research.md** - User research and findings
 - **figma.md** - Figma file links
 - **analytics.md** - Analytics requirements
+- **content.md** - Copy & content brief (voice, labels, microcopy)
 `;
 
 const insightsReadme = `# Insights
@@ -103,6 +107,25 @@ writeFile(join(projectPath, 'README.md'), projectReadme);
 writeFile(join(contextPath, 'README.md'), contextReadme);
 writeFile(join(insightsPath, 'README.md'), insightsReadme);
 
+// Memory: what carries across reviews. The review agent reads these at the start of a run and
+// updates session.md + project.md at the end.
+const memoryReadme = `# Memory
+
+🧠 What Superdesigner remembers between reviews.
+
+- **session.md** - Summary of the most recent review run
+- **project.md** - Durable facts and decisions about this project
+- **user-preferences.md** - The designer's recurring preferences and overrides
+
+The review agent updates session.md and project.md after each run. Edit user-preferences.md to
+steer future reviews.
+`;
+
+writeFile(join(memoryPath, 'README.md'), memoryReadme);
+writeFile(join(memoryPath, 'session.md'), `# Session memory\n\n*No reviews run yet.*\n`);
+writeFile(join(memoryPath, 'project.md'), `# Project memory\n\n*Durable facts about ${projectName} accumulate here across reviews.*\n`);
+writeFile(join(memoryPath, 'user-preferences.md'), `# User preferences\n\n*Recurring preferences and overrides. Edit this to steer future reviews (e.g. "always weight accessibility highly", "we dismissed copy suggestions about CTA length").*\n`);
+
 // Success output
 console.log('');
 console.log(`✅ Created project: ${projectName}`);
@@ -114,7 +137,9 @@ console.log('     - prd.md         (Product requirements)');
 console.log('     - research.md    (Research notes)');
 console.log('     - figma.md       (Figma link)');
 console.log('     - analytics.md   (Analytics requirements)');
+console.log('     - content.md     (Copy & content brief)');
 console.log('   insights/          (Generated outputs go here)');
+console.log('   memory/            (Carries across reviews)');
 console.log('');
 console.log('📝 Next steps:');
 console.log('   1. Edit context/prd.md with your requirements');

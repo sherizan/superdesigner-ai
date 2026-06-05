@@ -16,7 +16,7 @@ You'll need:
 - **Node.js 18+** — [Download here](https://nodejs.org) if you don't have it
 - **Claude Code** — the review agent ([install guide](https://code.claude.com/docs/en/overview))
 - **Cursor** — [Download here](https://cursor.com) (free), your editor and filesystem
-- **Figma desktop app** with Dev Mode MCP enabled (for pinning comments to real screens)
+- **Figma desktop app** with Dev Mode MCP enabled — optional, recommended (for pinning comments to verified screens)
 
 To check your Node version:
 ```bash
@@ -49,8 +49,10 @@ npm install -g @anthropic-ai/claude-code
 claude   # run once to sign in
 ```
 
-The Figma MCP is already wired up in `.mcp.json` (the official Figma Dev Mode MCP). Just open the
-Figma desktop app with Dev Mode MCP enabled before you run a review.
+The Figma MCP is already wired up in `.mcp.json` (the official Figma Dev Mode MCP). Open the
+Figma desktop app with Dev Mode MCP enabled before a review to pin comments to verified screens.
+It's optional — without it, the review still runs against your `figma.md` and the other context,
+and notes that live Figma inspection was skipped.
 
 **Prefer Cursor?** Install the Cursor CLI (`curl https://cursor.com/install -fsS | bash`, then
 `agent login`) and add `--cursor` to the review command. Or skip both and run the prompt manually.
@@ -80,6 +82,11 @@ superdesigner review checkout-flow --agent
 
 The `--agent` flag runs Claude Code automatically to generate your review.
 
+**No Figma file yet?** If `figma.md` has no link, `review` flips to **scaffold mode**: it proposes
+screens from your PRD and builds a starting point — starter frames in your open Figma file, or a
+single-file HTML prototype in `projects/<slug>/prototype/`. Force a path with `--scaffold figma|code`
+(omit to let the agent choose or ask). This solves the blank-canvas problem.
+
 **Inside Claude Code?** Open this repo and run `/review checkout-flow` instead.
 **Prefer Cursor?** Add `--cursor`, or run without `--agent` and open the prompt in Cursor manually.
 
@@ -90,13 +97,15 @@ The `--agent` flag runs Claude Code automatically to generate your review.
 ```
 You write                    Superdesigner generates
 ─────────────────────────    ─────────────────────────
-context/prd.md          →    insights/design-review.md
+context/prd.md          →    insights/design-review.md      (review mode)
 context/research.md     →    insights/design-comments.preview.md
-context/figma.md
+context/figma.md        →    insights/screen-plan.md        (scaffold mode, no Figma yet)
+context/content.md           prototype/*.html  or  Figma frames
 ```
 
-**Context** = what you know (requirements, research, Figma links)  
-**Insights** = what Superdesigner finds (missing states, edge cases, questions)
+**Context** = what you know (requirements, research, Figma links, copy)  
+**Insights** = what Superdesigner finds (missing states, edge cases, questions) — or, with no Figma
+yet, the screens it proposes from your PRD
 
 ---
 
@@ -108,9 +117,21 @@ context/figma.md
 | `superdesigner review <project>` | Generate design review prompts |
 | `superdesigner review <project> --agent` | Generate and run with Claude Code |
 | `superdesigner review <project> --agent --cursor` | Run with the Cursor agent instead |
+| `superdesigner review <project> --scaffold code --agent` | No Figma yet → build a starting point from the PRD |
+| `superdesigner review <project> --workflow --agent` | Run the review via the deterministic dynamic-workflow orchestrator |
 | `/review <project>` | Run the review inside Claude Code (interactive) |
 | `superdesigner comment <project>` | Post comments to Figma |
 | `superdesigner doctor` | Check if everything is set up |
+
+### Review options
+
+- `--intent pre-handoff\|pre-launch\|gap-audit` — route what's checked and how findings are weighted (omit to infer).
+- `--scaffold figma\|code` — in scaffold mode (no Figma), build starter frames on the canvas or an HTML prototype.
+- `--workflow` — run the review through the multi-agent workflow: five scoped agents (PRD, Figma, UX,
+  Content, Analytics) fan out in parallel with schema-validated findings, then deterministic
+  synthesis (dedupe, rank, 10-comment cap). See
+  [`docs/eval-dynamic-workflow-orchestrator.md`](docs/eval-dynamic-workflow-orchestrator.md) for the
+  observability/eval writeup.
 
 ---
 
@@ -120,8 +141,12 @@ context/figma.md
 |------|-------------|
 | `prd.md` | Your product requirements — goals, user stories, acceptance criteria |
 | `research.md` | User research, interviews, insights (optional) |
-| `figma.md` | Link to your Figma file |
+| `figma.md` | Link to your Figma file (leave empty to scaffold screens from the PRD instead) |
 | `analytics.md` | What you want to track (optional) |
+| `content.md` | Copy & content brief — voice, key labels, microcopy (optional) |
+
+There's also a workspace-level `DESIGN.md` (UX principles + voice guidelines) the review cites as its
+reference for what "good" means; a per-project `context/DESIGN.md` overrides it.
 
 ---
 
