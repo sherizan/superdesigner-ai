@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>document.documentElement.classList.add('js')</script>
+<title>Superdesigner — walk into every crit with the gaps already highlighted</title>
+<meta name="description" content="Superdesigner is the design review that runs before the review. For design leaders who run crits: it connects your PRD, research, Figma, and analytics, then hands you the missing states, broken flows, and unanswered questions — with every finding cited. Reviews intent, not pixels.">
+<meta property="og:title" content="Superdesigner — reviews intent, not pixels">
+<meta property="og:description" content="For design leaders who run the room. Walk into every crit with the gaps already mapped — every finding cites its source.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://superdesigner.ai">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2317130F'/%3E%3Crect x='6' y='19' width='20' height='6' rx='2' fill='%23E4FB52'/%3E%3Ctext x='16' y='16' font-family='Georgia,serif' font-size='15' font-style='italic' fill='%23F4EFE3' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4EFE3; --paper-2:#EFE8D8; --ink:#17130F; --ink-2:#5b5246; --ink-3:#8a7f6f;
+    --acid:#E4FB52; --acid-deep:#c9e22f; --redline:#E0503A; --line:#dcd2bd; --card:#FBF8F0;
+    --shadow: 0 1px 0 rgba(23,19,15,.04), 0 18px 40px -24px rgba(23,19,15,.45);
+    --serif:'Fraunces',Georgia,serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper); color:var(--ink); font-family:var(--sans);
+    font-size:17px; line-height:1.6; -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* paper grain + crit-board dotted grid */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:1120px; margin:0 auto; padding:0 28px; position:relative; z-index:1}
+  a{color:inherit}
+  .mono{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase}
+
+  /* highlighter swipe */
+  .mark{
+    background-image:linear-gradient(120deg,var(--acid),var(--acid));
+    background-repeat:no-repeat; background-position:0 84%; background-size:0% 42%;
+    -webkit-box-decoration-break:clone; box-decoration-break:clone; padding:0 .04em;
+    animation:swipe .85s cubic-bezier(.55,.08,.2,1) forwards; animation-delay:.55s;
+  }
+  .mark.red{background-image:linear-gradient(120deg,var(--redline),var(--redline)); background-size:0% 12%; background-position:0 96%}
+  @keyframes swipe{to{background-size:100% 42%}}
+  .mark.red{animation-name:swipeRed} @keyframes swipeRed{to{background-size:100% 14%}}
+
+  /* nav */
+  nav{position:sticky; top:0; z-index:50; background:color-mix(in srgb,var(--paper) 86%, transparent); backdrop-filter:blur(8px); border-bottom:1px solid var(--line)}
+  .nav-in{display:flex; align-items:center; gap:18px; height:66px}
+  .brand{display:flex; align-items:center; gap:10px; font-family:var(--serif); font-weight:600; font-size:21px; letter-spacing:-.01em}
+  .brand .dot{width:26px;height:26px;border-radius:7px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-style:italic;font-size:15px}
+  .nav-tag{color:var(--ink-2)}
+  .nav-spacer{flex:1}
+  .nav-links{display:flex; gap:22px; align-items:center}
+  .nav-links a{color:var(--ink-2); text-decoration:none; transition:color .2s}
+  .nav-links a:hover{color:var(--ink)}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--paper);text-decoration:none;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;padding:11px 17px;border-radius:9px;border:1px solid var(--ink);
+    transition:transform .15s ease, box-shadow .2s ease}
+  .btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px -10px rgba(23,19,15,.5)}
+  .btn.ghost{background:transparent;color:var(--ink)}
+  .btn.ghost:hover{background:var(--acid); border-color:var(--ink)}
+  @media (max-width:640px){
+    .nav-tag{display:none}
+    .nav-links a:not(.btn){display:none}
+  }
+
+  /* hero */
+  header.hero{padding:clamp(54px,9vw,116px) 0 60px; position:relative}
+  .eyebrow{color:var(--ink-2); margin-bottom:26px; display:inline-flex; gap:10px; align-items:center}
+  .eyebrow::before{content:""; width:26px; height:1px; background:var(--ink); display:inline-block}
+  h1{font-family:var(--serif); font-weight:580; font-size:clamp(40px,6.6vw,82px); line-height:1.02; letter-spacing:-.02em; max-width:14ch}
+  h1 em{font-style:italic; font-weight:480}
+  .lede{margin-top:30px; font-size:clamp(18px,2.1vw,22px); line-height:1.55; max-width:54ch; color:#2b2620}
+  .cta-row{margin-top:38px; display:flex; gap:14px; flex-wrap:wrap; align-items:center}
+  .cta-note{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); letter-spacing:.04em}
+
+  /* floating annotation card */
+  .annot{position:absolute; right:0; top:clamp(60px,11vw,128px); width:288px; background:var(--card);
+    border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); padding:16px 17px; transform:rotate(2.2deg);
+    z-index:2}
+  .annot .pin{position:absolute; left:-9px; top:-9px; width:22px; height:22px; border-radius:50%; background:var(--redline);
+    box-shadow:0 4px 10px -3px rgba(224,80,58,.7); border:2px solid var(--paper)}
+  .annot .who{display:flex; align-items:center; gap:9px; margin-bottom:9px}
+  .annot .ava{width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--acid);display:grid;place-items:center;font-family:var(--mono);font-size:10px}
+  .annot .who b{font-size:13px} .annot .who span{font-family:var(--mono);font-size:10px;color:var(--ink-3);margin-left:auto}
+  .annot p{font-size:13.5px; line-height:1.5}
+  .annot .cite{margin-top:10px; padding-top:9px; border-top:1px dashed var(--line); font-family:var(--mono); font-size:10.5px; color:var(--ink-2); display:flex; gap:6px; align-items:flex-start}
+  .annot .cite b{color:var(--redline)}
+  @media (max-width:920px){ .annot{display:none} }
+
+  /* generic section */
+  section{padding:clamp(54px,8vw,96px) 0; position:relative}
+  .sec-head{display:flex; align-items:baseline; gap:18px; margin-bottom:40px; flex-wrap:wrap}
+  .sec-head .num{font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+  h2{font-family:var(--serif); font-weight:560; font-size:clamp(28px,4vw,46px); line-height:1.06; letter-spacing:-.015em; max-width:18ch}
+  .sec-sub{color:var(--ink-2); max-width:50ch; margin-top:14px}
+  .rule{height:1px; background:var(--line); border:0}
+
+  /* pain strip */
+  .pain{background:var(--ink); color:var(--paper); border-radius:20px; padding:clamp(30px,4vw,52px); position:relative; overflow:hidden}
+  .pain .mono{color:var(--acid)}
+  .pain h2{color:var(--paper); margin-top:14px}
+  .pain .scatter{display:flex; gap:10px 14px; flex-wrap:wrap; margin-top:26px}
+  .chip{font-family:var(--mono); font-size:12px; color:var(--paper); border:1px solid rgba(244,239,227,.28); padding:8px 13px; border-radius:999px}
+  .chip.dim{opacity:.55}
+  .pain .punch{margin-top:26px; font-family:var(--serif); font-size:clamp(19px,2.4vw,26px); line-height:1.35; max-width:32ch}
+  .pain .punch i{color:var(--acid); font-style:normal}
+
+  /* benefits */
+  .grid{display:grid; gap:16px}
+  .b-grid{grid-template-columns:repeat(2,1fr)}
+  .bcard{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:26px 24px; box-shadow:var(--shadow);
+    transition:transform .2s ease, box-shadow .2s ease}
+  .bcard:hover{transform:translateY(-4px)}
+  .bcard .k{font-family:var(--mono); font-size:11px; color:var(--ink-3); letter-spacing:.12em}
+  .bcard h3{font-family:var(--serif); font-weight:560; font-size:23px; margin:12px 0 9px; letter-spacing:-.01em; line-height:1.12}
+  .bcard p{font-size:15px; color:var(--ink-2); line-height:1.55}
+  .bcard .tick{display:inline-block; margin-top:14px; font-family:var(--mono); font-size:11px; color:var(--ink); background:var(--acid); padding:4px 9px; border-radius:6px}
+  @media (max-width:720px){ .b-grid{grid-template-columns:1fr} }
+
+  /* panel of reviewers */
+  .panel{display:grid; grid-template-columns:repeat(5,1fr); gap:12px}
+  .agent{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px 16px; position:relative;
+    transition:transform .2s ease, background .2s ease}
+  .agent:hover{transform:translateY(-5px) rotate(-1deg); background:var(--paper-2)}
+  .agent .n{font-family:var(--mono); font-size:10.5px; color:var(--ink-3)}
+  .agent h4{font-family:var(--serif); font-weight:600; font-size:19px; margin:8px 0 8px}
+  .agent p{font-size:13px; color:var(--ink-2); line-height:1.5}
+  .agent .role{position:absolute; top:14px; right:14px; width:8px; height:8px; border-radius:50%; background:var(--acid-deep)}
+  @media (max-width:860px){ .panel{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:480px){ .panel{grid-template-columns:1fr} }
+
+  /* how it works */
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; counter-reset:s}
+  .step{position:relative; padding-top:18px; border-top:2px solid var(--ink)}
+  .step::before{counter-increment:s; content:"0" counter(s); font-family:var(--mono); font-size:12px; color:var(--ink); background:var(--acid); padding:3px 8px; border-radius:5px; position:absolute; top:-14px; left:0}
+  .step h4{font-family:var(--serif); font-weight:560; font-size:22px; margin:14px 0 8px; letter-spacing:-.01em}
+  .step p{font-size:14.5px; color:var(--ink-2)}
+  .step code{font-family:var(--mono); font-size:12.5px; background:var(--paper-2); border:1px solid var(--line); padding:2px 7px; border-radius:6px; color:var(--ink)}
+  @media (max-width:720px){ .steps{grid-template-columns:1fr} }
+
+  /* proof */
+  .proof{background:var(--card); border:1px solid var(--line); border-radius:18px; overflow:hidden; box-shadow:var(--shadow)}
+  .proof .bar{background:var(--paper-2); border-bottom:1px solid var(--line); padding:12px 20px; font-family:var(--mono); font-size:11.5px; color:var(--ink-2); display:flex; gap:8px; align-items:center; letter-spacing:.06em}
+  .proof .bar .dotrow{display:flex; gap:6px; margin-right:6px}
+  .proof .bar .dotrow i{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .proof .body{padding:clamp(22px,3vw,34px)}
+  .finding{display:flex; gap:16px; padding:18px 0; border-bottom:1px dashed var(--line)}
+  .finding:last-child{border-bottom:0}
+  .finding .sev{flex:none; font-family:var(--mono); font-size:11px; font-weight:500; padding:4px 8px; border-radius:6px; height:fit-content}
+  .sev.p0{background:var(--redline); color:#fff} .sev.p1{background:var(--acid); color:var(--ink)}
+  .finding .q{font-family:var(--serif); font-size:18px; line-height:1.3; margin-bottom:7px}
+  .finding .src{font-family:var(--mono); font-size:11px; color:var(--ink-2)} .finding .src b{color:var(--ink)}
+
+  /* ticker / differentiators */
+  .ticker{background:var(--ink); color:var(--paper); border-radius:16px; padding:22px 8px; overflow:hidden; white-space:nowrap}
+  .ticker .run{display:inline-flex; gap:44px; animation:scroll 26s linear infinite; will-change:transform}
+  .ticker:hover .run{animation-play-state:paused}
+  .ticker span{font-family:var(--serif); font-size:clamp(20px,2.6vw,30px); font-style:italic; display:inline-flex; gap:44px; align-items:center}
+  .ticker span::after{content:"✲"; color:var(--acid); font-style:normal; font-size:.7em}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+
+  /* final CTA */
+  .final{text-align:center; padding:clamp(60px,9vw,120px) 0}
+  .final h2{margin:0 auto; max-width:20ch}
+  .final .lede{margin:22px auto 0}
+  .final .cta-row{justify-content:center}
+
+  footer{border-top:1px solid var(--line); padding:40px 0 56px}
+  .foot{display:flex; gap:18px; align-items:center; flex-wrap:wrap; color:var(--ink-2); font-size:14px}
+  .foot .mono{color:var(--ink-3)}
+  .foot a{color:var(--ink-2); text-decoration:none} .foot a:hover{color:var(--ink)}
+
+  /* reveal on scroll — only hide when JS is present to reveal it (progressive enhancement) */
+  .js .reveal{opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1)}
+  .js .reveal.in{opacity:1; transform:none}
+  @media (prefers-reduced-motion:reduce){
+    .js .reveal{opacity:1; transform:none; transition:none}
+    .mark{animation:none; background-size:100% 42%} .mark.red{background-size:100% 14%}
+    .ticker .run{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="#top" style="text-decoration:none"><span class="dot"><em>S</em></span>Superdesigner</a>
+    <span class="nav-tag mono">for design leaders</span>
+    <span class="nav-spacer"></span>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#reviewers">The panel</a>
+      <a class="btn ghost" href="https://github.com/sherizan/superdesigner-ai">GitHub ↗</a>
+    </div>
+  </div>
+</nav>
+
+<a id="top"></a>
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow mono">For design leaders who run the room</span>
+    <h1>Walk into every crit with the gaps <span class="mark">already highlighted.</span></h1>
+    <p class="lede">Superdesigner is the design review that runs <em>before</em> the review. It connects your PRD, research, Figma, and analytics — then hands you the missing states, broken flows, and unanswered questions. It reviews <em>intent, not pixels</em>, and every finding cites its source.</p>
+    <div class="cta-row">
+      <a class="btn" href="https://github.com/sherizan/superdesigner-ai">Get it on GitHub ↗</a>
+      <a class="btn ghost" href="#how">See how it works</a>
+      <span class="cta-note">runs on Claude Code · pairs with Cursor</span>
+    </div>
+
+    <aside class="annot" aria-hidden="true">
+      <span class="pin"></span>
+      <div class="who"><span class="ava">UX</span><b>UX agent</b><span>P0</span></div>
+      <p>Have you considered the amount shown in two formats between capture and confirmation? It’s the moment users lose trust.</p>
+      <div class="cite"><b>↳</b><span>research §1 · DESIGN.md §3 · Figma 10:220 — drives the 23% drop-off</span></div>
+    </aside>
+  </div>
+</header>
+
+<section id="pain">
+  <div class="wrap reveal">
+    <div class="pain">
+      <span class="mono">The job nobody put in your title</span>
+      <h2>You’re expected to hold the whole product in your head.</h2>
+      <div class="scatter">
+        <span class="chip">PRD in Confluence</span>
+        <span class="chip">research in Notion</span>
+        <span class="chip">designs in Figma</span>
+        <span class="chip">data in dashboards</span>
+        <span class="chip dim">feedback in tickets</span>
+        <span class="chip dim">decisions in Slack</span>
+      </div>
+      <p class="punch">In the crit, you connect all of it <i>live</i> — and you’re the one who’s supposed to catch what everyone missed. Superdesigner does that prep, so you never get blindsided.</p>
+    </div>
+  </div>
+</section>
+
+<section id="benefits">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="num mono">01 / why leaders run it</span>
+    </div>
+    <div class="grid b-grid">
+      <div class="bcard reveal">
+        <span class="k mono">NEVER MISS THE MARK</span>
+        <h3>Every gap, mapped before you walk in</h3>
+        <p>Missing states, edge cases, and unmet PRD requirements — surfaced and prioritised before the review, not discovered in it.</p>
+        <span class="tick mono">5 states · every screen</span>
+      </div>
+      <div class="bcard reveal" style="transition-delay:.06s">
+        <span class="k mono">SCORE THE BROWNIE POINTS</span>
+        <h3>Ask the sharp question first</h3>
+        <p>Walk in with the redlines already done and the right questions queued. Be the person in the room who saw it coming.</p>
+        <span class="tick mono">questions, not verdicts</span>
+      </div>
+      <div class="bcard reveal" style="transition-delay:.12s">
+        <span class="k mono">MANAGE QUALITY AT SCALE</span>
+        <h3>The same rigour on every project</h3>
+        <p>One consistent, senior-level review across every flow and every designer on your team — without you reviewing every pixel yourself.</p>
+        <span class="tick mono">pre-handoff · pre-launch · gap-audit</span>
+      </div>
+      <div class="bcard reveal" style="transition-delay:.18s">
+        <span class="k mono">EVIDENCE, NOT OPINION</span>
+        <h3>End the taste wars in crit</h3>
+        <p>Every finding cites a PRD line, a research quote, a DESIGN.md rule, or a data point. If it can’t cite a source, it doesn’t ship.</p>
+        <span class="tick mono">cite the source or cut it</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="reviewers">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="num mono">02 / the panel</span>
+      <div>
+        <h2>Five reviewers in the room — every single time</h2>
+        <p class="sec-sub">Each one has a single job, its own sources, and only the tools it needs. They run in parallel, then their findings are merged, ranked, and capped to the ten that matter.</p>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="agent reveal"><span class="role"></span><div class="n mono">01</div><h4>PRD</h4><p>Does every requirement have a screen and the states to make it work?</p></div>
+      <div class="agent reveal" style="transition-delay:.05s"><span class="role"></span><div class="n mono">02</div><h4>Figma</h4><p>Reads the file, maps the screen structure and node IDs. The only one that touches Figma.</p></div>
+      <div class="agent reveal" style="transition-delay:.1s"><span class="role"></span><div class="n mono">03</div><h4>UX</h4><p>Missing states, cognitive load, flow clarity, trust signals — graded against your DESIGN.md.</p></div>
+      <div class="agent reveal" style="transition-delay:.15s"><span class="role"></span><div class="n mono">04</div><h4>Content</h4><p>Copy against the brief and your voice: vague labels, legalese, missing error microcopy.</p></div>
+      <div class="agent reveal" style="transition-delay:.2s"><span class="role"></span><div class="n mono">05</div><h4>Analytics</h4><p>Is what you want to measure actually measurable? Flags the events that won’t fire.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="num mono">03 / how it works</span>
+      <div><h2>Three steps. About a minute of your attention.</h2></div>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <h4>Drop in the context</h4>
+        <p>Point it at your PRD, research, Figma link, analytics, and copy brief. No design yet? It’ll propose the screens from your PRD instead.</p>
+      </div>
+      <div class="step reveal" style="transition-delay:.08s">
+        <h4>Run the review</h4>
+        <p>One command — <code>superdesigner review</code> — or <code>/review</code> inside Claude Code. Five agents fan out and reason about your intent.</p>
+      </div>
+      <div class="step reveal" style="transition-delay:.16s">
+        <h4>Walk in prepared</h4>
+        <p>You get a cited <code>design-review.md</code> and up to ten ready-to-post Figma comments — ranked by impact, one idea each.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="proof">
+  <div class="wrap reveal">
+    <div class="sec-head">
+      <span class="num mono">04 / what lands on your desk</span>
+      <div><h2>A review you’d be proud to have written</h2></div>
+    </div>
+    <div class="proof">
+      <div class="bar"><span class="dotrow"><i style="background:#E0503A"></i><i style="background:#E4FB52"></i><i style="background:#1e8e3e"></i></span>design-review.md — Voice Money Transfer · intent: pre-launch</div>
+      <div class="body">
+        <div class="finding">
+          <span class="sev p0 mono">P0</span>
+          <div>
+            <div class="q">Is the amount shown in the exact same format at capture and at confirmation?</div>
+            <div class="src">↳ <b>research §1</b> “if the number looks even slightly different I start over” · <b>DESIGN.md §3</b> plain-language · <b>Figma 10:220</b> — the documented driver of the 23% confirmation drop-off.</div>
+          </div>
+        </div>
+        <div class="finding">
+          <span class="sev p0 mono">P0</span>
+          <div>
+            <div class="q">Where is the failure state — the flow ends at Success, but the PRD requires a reason and a retry path?</div>
+            <div class="src">↳ <b>PRD §4</b> failure state + retry · <b>research pain #3</b> “it just said error” · no error screen in the Figma inventory.</div>
+          </div>
+        </div>
+        <div class="finding">
+          <span class="sev p1 mono">P1</span>
+          <div>
+            <div class="q">Does the Confirmation CTA spell out the consequence of an irreversible action?</div>
+            <div class="src">↳ <b>content.md</b> “Send AED 250 — this can’t be undone” · <b>DESIGN.md §3.1</b> consequence language.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap reveal">
+    <div class="ticker" aria-label="What makes Superdesigner different">
+      <div class="run">
+        <span>reviews intent, not pixels</span><span>evidence or it doesn’t ship</span><span>max 10 comments — signal, not noise</span><span>questions, not verdicts</span><span>runs on Claude Code</span>
+        <span aria-hidden="true">reviews intent, not pixels</span><span aria-hidden="true">evidence or it doesn’t ship</span><span aria-hidden="true">max 10 comments — signal, not noise</span><span aria-hidden="true">questions, not verdicts</span><span aria-hidden="true">runs on Claude Code</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap reveal">
+    <span class="eyebrow mono" style="justify-content:center;display:flex">Before the next review on your calendar</span>
+    <h2>Be the leader who <span class="mark red">already saw it.</span></h2>
+    <p class="lede">Run it once before your next crit. Catch the gaps, ask the sharp questions, and hand your team a review grounded in evidence — not taste.</p>
+    <div class="cta-row">
+      <a class="btn" href="https://github.com/sherizan/superdesigner-ai">Start on GitHub ↗</a>
+      <a class="btn ghost" href="#top">Back to top</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <a class="brand" href="#top" style="text-decoration:none;font-size:18px"><span class="dot" style="width:22px;height:22px;font-size:13px"><em>S</em></span>Superdesigner</a>
+    <span class="nav-spacer"></span>
+    <span class="mono">reviews intent, not pixels</span>
+    <a href="https://github.com/sherizan/superdesigner-ai">GitHub</a>
+    <span class="mono">superdesigner.ai</span>
+  </div>
+</footer>
+
+<script>
+  // staggered scroll reveals
+  const io = new IntersectionObserver((entries)=>{
+    for(const e of entries){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }
+  },{threshold:.12, rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

@@ -1,6 +1,12 @@
 # Superdesigner
 
-Superdesigner is a product reasoning workflow that runs on Claude Code, connecting PRDs, research, designs, and analytics to surface design gaps and blind spots before review, handoff, or launch. Cursor stays your editor and filesystem; Claude Code is the agent that does the review. The two pair.
+**For design leaders who run the crits and the reviews.** Superdesigner is the design review that
+runs *before* the review: it connects your PRD, research, Figma, and analytics, then hands you the
+missing states, broken flows, and unanswered questions — so you walk into every crit with the gaps
+already mapped. It reviews **intent, not pixels**, and every finding cites its source. Runs on Claude
+Code; Cursor stays your editor and filesystem. The two pair.
+
+🔗 **[superdesigner.ai](https://superdesigner.ai)** — landing page lives in [`site/`](site/) (single self-contained HTML, deploys on Cloudflare Pages).
 
 ## 🎥 Watch the demo
 
