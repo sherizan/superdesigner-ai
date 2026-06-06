@@ -28,7 +28,7 @@ skipped.
 ## Run a review (or scaffold)
 
 - **Interactive:** open this repo in Claude Code and run `/review <project-slug>`.
-- **Headless:** `superdesigner review <project-slug> --agent` (shells out to `claude -p`).
+- **Headless:** `superdesigner review <project-slug>` runs the review via `claude -p` (add `--no-agent` to just prepare the prompt).
 
 The command picks the mode from `figma.md`:
 

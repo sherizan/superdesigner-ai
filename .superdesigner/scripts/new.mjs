@@ -144,5 +144,5 @@ console.log('');
 console.log('📝 Next steps:');
 console.log('   1. Edit context/prd.md with your requirements');
 console.log('   2. Add your Figma link in context/figma.md');
-console.log(`   3. Run: superdesigner review ${slug} --agent`);
+console.log(`   3. Run: superdesigner review ${slug}`);
 console.log('');

@@ -114,7 +114,7 @@ async function checkClaudeCode() {
         ok: true, // Informational, not a hard failure
         message: available
           ? 'Claude Code CLI available (claude)'
-          : 'Claude Code CLI not found (needed for --agent)',
+          : 'Claude Code CLI not found (needed to run reviews)',
         fix: available ? null : 'Run: npm install -g @anthropic-ai/claude-code'
       });
     });
@@ -122,7 +122,7 @@ async function checkClaudeCode() {
     child.on('error', () => {
       resolve({
         ok: true,
-        message: 'Claude Code CLI not found (needed for --agent)',
+        message: 'Claude Code CLI not found (needed to run reviews)',
         fix: 'Run: npm install -g @anthropic-ai/claude-code'
       });
     });
@@ -132,7 +132,7 @@ async function checkClaudeCode() {
 /**
  * Check if Cursor Agent CLI is available.
  * The command is "agent" (installed via Cursor > Command Palette > Install 'agent' command).
- * Optional: only used when running --agent --cursor.
+ * Optional: only used when running --cursor.
  * @returns {Promise<{ok: boolean, message: string, fix?: string}>}
  */
 async function checkCursorAgent() {
@@ -234,7 +234,7 @@ export async function run(args) {
     console.log('');
     console.log('Quick start:');
     console.log('  superdesigner init "My Project"');
-    console.log('  superdesigner review my-project --agent');
+    console.log('  superdesigner review my-project');
   } else {
     console.log('Some checks failed. Fix the issues above and run again.');
     if (fixableIssues.length > 0 && !autoFix) {

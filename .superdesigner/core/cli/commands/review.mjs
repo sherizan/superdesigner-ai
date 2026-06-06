@@ -1,7 +1,7 @@
 /**
  * Review command - generates design review prompts.
  * Delegates to scripts/review.mjs via spawn.
- * Optionally runs the agent with --agent (Claude Code by default; --cursor for Cursor).
+ * Runs the agent by default (Claude Code; --cursor for Cursor; --no-agent to just prepare the prompt).
  */
 
 import { spawn } from 'child_process';
@@ -35,7 +35,7 @@ function getVersion() {
  * @returns {{slug: string|null, useAgent: boolean, useCursor: boolean, agentTimeout: number, model: string|null, scriptArgs: string[]}}
  */
 function parseArgs(args) {
-  let useAgent = false;
+  let useAgent = true;   // default: run the review. Opt out with --no-agent / --prompt-only.
   let useCursor = false;
   let agentTimeout = 10;
   let model = null;
@@ -46,7 +46,10 @@ function parseArgs(args) {
     const arg = args[i];
 
     if (arg === '--agent') {
-      useAgent = true;
+      useAgent = true; // accepted for back-compat; running is now the default
+    } else if (arg === '--no-agent' || arg === '--prompt-only') {
+      // Just prepare the prompt files; don't run the agent.
+      useAgent = false;
     } else if (arg === '--cursor') {
       // Opt back into the Cursor agent (the pairing); Claude Code is the default.
       useCursor = true;
@@ -137,24 +140,25 @@ export async function run(args) {
     process.exit(exitCode);
   }
 
-  // If --agent flag is not passed, show manual next steps
+  // --no-agent: just prepare the prompt and show how to run it.
   if (!useAgent) {
     const target = slug && slug !== 'all' ? slug : '<project>';
-    console.log('📝 Next step, pick one:');
+    console.log('📝 Prompt ready (--no-agent). Run it with:');
     console.log(`   • In Claude Code (this repo):  /review ${target}`);
-    console.log(`   • Headless:                    superdesigner review ${target} --agent`);
+    console.log(`   • Headless:                    superdesigner review ${target}`);
     console.log('   • In Cursor (manual):          open _review_prompt.md → Cmd+I → Agent mode');
     console.log('');
     return;
   }
 
-  // Agent mode requires a single project slug (not "all")
+  // Running the agent needs a single project slug — "all" prepares prompts for every project.
   if (!slug || slug === 'all') {
     console.log('');
-    console.log('⚠️  --agent requires a single project slug, not "all".');
-    console.log('   Example: superdesigner review my-project --agent');
+    console.log('📝 Prepared prompts for all projects (agent mode runs one project at a time).');
+    console.log('   Run one with: superdesigner review <project>');
+    console.log('   Prepare only: superdesigner review <project> --no-agent');
     console.log('');
-    process.exit(1);
+    return;
   }
 
   // Locate the generated prompt file in insights/
@@ -216,7 +220,7 @@ export async function run(args) {
       console.log(`   ${promptPath}`);
       console.log('');
       console.log('After signing in, run again:');
-      console.log(`   superdesigner review ${slug} --agent${useCursor ? ' --cursor' : ''}`);
+      console.log(`   superdesigner review ${slug}${useCursor ? ' --cursor' : ''}`);
       console.log('');
     } else {
       console.error('');

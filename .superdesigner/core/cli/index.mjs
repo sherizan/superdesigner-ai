@@ -109,8 +109,9 @@ Options:
   --no-telemetry   Disable anonymous usage telemetry
 
 Review Options:
-  --agent                  Run the agent after generating prompts (Claude Code by default)
-  --cursor                 Use the Cursor agent instead of Claude Code (with --agent)
+  (review runs the agent by default — Claude Code; falls back to prompt-only if the CLI isn't found)
+  --no-agent               Just prepare the prompt files; don't run the agent (alias: --prompt-only)
+  --cursor                 Use the Cursor agent instead of Claude Code
   --model <name>           Model override for Claude Code (e.g. claude-opus-4-6)
   --agent-timeout <min>    Agent timeout in minutes (default: 10)
   --intent <type>          Review intent: pre-handoff | pre-launch | gap-audit
@@ -123,13 +124,13 @@ Review Options:
 
 Examples:
   superdesigner init "My Project"
-  superdesigner review my-project
-  superdesigner review my-project --agent
-  superdesigner review my-project --intent pre-launch --agent
-  superdesigner review my-project --scaffold code --agent   # no Figma yet → build from PRD
-  superdesigner review my-project --workflow --agent         # deterministic workflow orchestrator
-  superdesigner review my-project --agent --agent-timeout 15
-  superdesigner review my-project --agent --cursor
+  superdesigner review my-project                            # runs the review (Claude Code)
+  superdesigner review my-project --no-agent                 # just prepare the prompt
+  superdesigner review my-project --intent pre-launch
+  superdesigner review my-project --scaffold code            # no Figma yet → build from PRD
+  superdesigner review my-project --workflow                 # deterministic workflow orchestrator
+  superdesigner review my-project --agent-timeout 15
+  superdesigner review my-project --cursor                   # use the Cursor agent
   superdesigner comment my-project --dry-run
   superdesigner doctor
 

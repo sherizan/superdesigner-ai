@@ -42,7 +42,7 @@ This installs dependencies and lets you run `superdesigner` from anywhere.
 
 ### Step 4: Set up Claude Code
 
-To use `--agent` mode (automated reviews), install Claude Code and sign in:
+Reviews run on Claude Code, so install it and sign in:
 
 ```bash
 npm install -g @anthropic-ai/claude-code
@@ -76,11 +76,12 @@ superdesigner init "Checkout Flow"
 # 2. Fill in your context (requirements, research, Figma link)
 # Edit: projects/checkout-flow/context/
 
-# 3. Generate your design review
-superdesigner review checkout-flow --agent
+# 3. Run your design review
+superdesigner review checkout-flow
 ```
 
-The `--agent` flag runs Claude Code automatically to generate your review.
+`review` runs the review automatically with Claude Code. (No `claude` CLI installed? It falls back to
+preparing the prompt and shows you how to run it.) Add `--no-agent` if you only want the prompt.
 
 **No Figma file yet?** If `figma.md` has no link, `review` flips to **scaffold mode**: it proposes
 screens from your PRD and builds a starting point — starter frames in your open Figma file, or a
@@ -88,7 +89,7 @@ single-file HTML prototype in `projects/<slug>/prototype/`. Force a path with `-
 (omit to let the agent choose or ask). This solves the blank-canvas problem.
 
 **Inside Claude Code?** Open this repo and run `/review checkout-flow` instead.
-**Prefer Cursor?** Add `--cursor`, or run without `--agent` and open the prompt in Cursor manually.
+**Prefer Cursor?** Add `--cursor`, or run with `--no-agent` and open the prompt in Cursor manually.
 
 ---
 
@@ -114,11 +115,11 @@ yet, the screens it proposes from your PRD
 | Command | What it does |
 |---------|--------------|
 | `superdesigner init "Name"` | Create a new project |
-| `superdesigner review <project>` | Generate design review prompts |
-| `superdesigner review <project> --agent` | Generate and run with Claude Code |
-| `superdesigner review <project> --agent --cursor` | Run with the Cursor agent instead |
-| `superdesigner review <project> --scaffold code --agent` | No Figma yet → build a starting point from the PRD |
-| `superdesigner review <project> --workflow --agent` | Run the review via the deterministic dynamic-workflow orchestrator |
+| `superdesigner review <project>` | Run the design review (Claude Code) |
+| `superdesigner review <project> --no-agent` | Just prepare the prompt, don't run it |
+| `superdesigner review <project> --cursor` | Run with the Cursor agent instead |
+| `superdesigner review <project> --scaffold code` | No Figma yet → build a starting point from the PRD |
+| `superdesigner review <project> --workflow` | Run the review via the deterministic dynamic-workflow orchestrator |
 | `/review <project>` | Run the review inside Claude Code (interactive) |
 | `superdesigner comment <project>` | Post comments to Figma |
 | `superdesigner doctor` | Check if everything is set up |
@@ -209,7 +210,7 @@ superdesigner review my-project --no-telemetry
 ## Requirements
 
 - Node.js 18 or later
-- [Claude Code](https://code.claude.com/docs/en/overview) (the review agent, for `--agent` mode and `/review`)
+- [Claude Code](https://code.claude.com/docs/en/overview) (the review agent that runs `review` and `/review`)
 - [Figma Dev Mode MCP](https://help.figma.com/hc/en-us/articles/32132100833559) (desktop app, for screen-level comments)
 - [Cursor](https://cursor.com) (your editor; add `--cursor` to run its agent instead)
 - Figma account (optional, for posting comments)
