@@ -32,8 +32,9 @@ skipped.
 
 The command picks the mode from `figma.md`:
 
-- **Review** (a Figma link is present): outputs `projects/<slug>/insights/design-review.md` and
-  `design-comments.preview.md`. Then `superdesigner comment <slug>` posts the comments to Figma.
+- **Review** (a Figma link is present): outputs `projects/<slug>/insights/design-review.html` (a
+  self-contained, branded report) and `design-comments.preview.md` (markdown, parsed by
+  `comment`). Then `superdesigner comment <slug>` posts the comments to Figma.
 - **Scaffold** (a PRD but no Figma link): outputs `insights/screen-plan.md` plus either starter
   frames in the open Figma file or an HTML prototype in `projects/<slug>/prototype/`. Force a path
   with `--scaffold figma|code` (omit to let the agent choose/ask).

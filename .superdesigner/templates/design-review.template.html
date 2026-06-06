@@ -1,0 +1,184 @@
+<!doctype html>
+<!--
+  Superdesigner — design review report (HTML, the standard output).
+  HOW TO USE: copy this file to projects/<slug>/insights/design-review.html and fill it in.
+  - Keep the <style> block intact (it's the Superdesigner brand).
+  - Replace the {tokens} in the masthead.
+  - In each section, replace the example rows with real findings, or remove the section if N/A.
+  - Finding pattern (repeat per finding):
+      <div class="finding"><span class="sev p0">P0</span><div>
+        <p class="q">A finding, framed as a question?</p>
+        <p class="src">↳ <b>source</b> citation · <b>source</b> citation</p></div></div>
+    Use sev p0 / p1 / p2. Every finding MUST carry a citation in .src, or cut it.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Review — {project_name}</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2317130F'/%3E%3Crect x='6' y='19' width='20' height='6' rx='2' fill='%23E4FB52'/%3E%3Ctext x='16' y='16' font-family='Georgia,serif' font-size='15' font-style='italic' fill='%23F4EFE3' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4EFE3; --paper-2:#EFE8D8; --ink:#17130F; --ink-2:#5b5246; --ink-3:#8a7f6f;
+    --acid:#E4FB52; --redline:#E0503A; --line:#dcd2bd; --card:#FBF8F0;
+    --p2:#1e8e3e;
+    --serif:'Fraunces',Georgia,serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased}
+  body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E")}
+  .wrap{max-width:860px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+  .mono{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+
+  /* masthead */
+  header.mast{padding:56px 0 30px;border-bottom:2px solid var(--ink);margin-bottom:8px}
+  .brand{display:inline-flex;align-items:center;gap:9px;font-family:var(--serif);font-weight:600;font-size:18px}
+  .brand .dot{width:24px;height:24px;border-radius:7px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-style:italic;font-size:13px}
+  header.mast h1{font-family:var(--serif);font-weight:560;font-size:clamp(32px,5vw,52px);line-height:1.04;letter-spacing:-.02em;margin:22px 0 14px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 10px}
+  .tag{font-family:var(--mono);font-size:11px;color:var(--ink-2);border:1px solid var(--line);background:var(--card);padding:5px 11px;border-radius:999px}
+  .tag b{color:var(--ink)}
+
+  section{padding:34px 0;border-bottom:1px solid var(--line)}
+  section:last-of-type{border-bottom:0}
+  .k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+  h2{font-family:var(--serif);font-weight:560;font-size:clamp(22px,3vw,30px);letter-spacing:-.015em;margin:8px 0 18px}
+  h3{font-family:var(--serif);font-weight:560;font-size:19px;margin:22px 0 10px}
+  p.lead{font-size:18px;line-height:1.55;color:#2b2620}
+
+  .finding{display:flex;gap:14px;padding:15px 0;border-bottom:1px dashed var(--line)}
+  .finding:last-child{border-bottom:0}
+  .sev{flex:none;height:fit-content;font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:6px}
+  .sev.p0{background:var(--redline);color:#fff}
+  .sev.p1{background:var(--acid);color:var(--ink)}
+  .sev.p2{background:var(--p2);color:#fff}
+  .q{font-family:var(--serif);font-size:18px;line-height:1.3;margin-bottom:6px}
+  .src{font-family:var(--mono);font-size:11px;color:var(--ink-2);line-height:1.5}
+  .src b{color:var(--ink)}
+  .covered{font-size:15px;color:var(--ink-2);padding:4px 0}
+  .covered::before{content:"✓ ";color:var(--p2);font-weight:600}
+  ul.q-list{list-style:none} ul.q-list li{padding:9px 0;border-bottom:1px dashed var(--line);font-size:15.5px}
+  ul.q-list li::before{content:"→ ";color:var(--ink-3);font-family:var(--mono)}
+  .prompt-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:10px 0}
+  .prompt-card .label{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.1em}
+  .prompt-card p{font-size:14.5px;margin-top:6px}
+  footer{padding:30px 0 60px}
+  .foot{display:flex;gap:14px;flex-wrap:wrap;align-items:center;color:var(--ink-3);font-size:13px}
+  @media print{ body::before{display:none} .tag,.prompt-card{box-shadow:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <span class="brand"><span class="dot"><em>S</em></span>Superdesigner</span>
+    <h1>Design Review — {project_name}</h1>
+    <div class="meta">
+      <span class="tag">date · <b>{date}</b></span>
+      <span class="tag">intent · <b>{intent}</b></span>
+      <span class="tag">mode · <b>{review | scaffold}</b></span>
+      <span class="tag">reviews intent, not pixels</span>
+    </div>
+  </header>
+
+  <section>
+    <span class="k">Executive summary</span>
+    <h2>The short version</h2>
+    <p class="lead">{2–3 sentences: design status, the biggest gaps, overall read. Note if live Figma inspection was skipped.}</p>
+  </section>
+
+  <section>
+    <span class="k">Recommendations · by priority</span>
+    <h2>What to fix, in order</h2>
+
+    <h3>P0 — blocking</h3>
+    <!-- repeat .finding per P0; remove the example -->
+    <div class="finding"><span class="sev p0">P0</span><div>
+      <p class="q">Is the amount shown in the same format at capture and at confirmation?</p>
+      <p class="src">↳ <b>research §1</b> users restart when the number looks different · <b>DESIGN.md §3</b> · <b>Figma 10:220</b> — the documented 23% drop-off.</p></div></div>
+
+    <h3>P1 — high impact</h3>
+    <div class="finding"><span class="sev p1">P1</span><div>
+      <p class="q">Does the confirmation CTA spell out the consequence of an irreversible action?</p>
+      <p class="src">↳ <b>content.md</b> “Send AED 250 — this can’t be undone” · <b>DESIGN.md §3.1</b>.</p></div></div>
+
+    <h3>P2 — nice to have</h3>
+    <div class="finding"><span class="sev p2">P2</span><div>
+      <p class="q">{A lower-priority finding, as a question?}</p>
+      <p class="src">↳ <b>{source}</b> {citation}.</p></div></div>
+  </section>
+
+  <section>
+    <span class="k">PRD alignment</span>
+    <h2>Promised vs. designed</h2>
+    <div class="covered">{Requirement that IS covered in the design}</div>
+    <!-- then any gaps as findings -->
+    <div class="finding"><span class="sev p0">P0</span><div>
+      <p class="q">{PRD requirement with no corresponding screen or state?}</p>
+      <p class="src">↳ <b>PRD §{n}</b> {what it requires} · not present in the Figma inventory.</p></div></div>
+  </section>
+
+  <section>
+    <span class="k">States &amp; UX</span>
+    <h2>The five states, per screen</h2>
+    <!-- findings for missing empty/loading/error/recovery + offline/permission, cognitive load, trust signals -->
+    <div class="finding"><span class="sev p0">P0</span><div>
+      <p class="q">{Missing state or flow gap, as a question?}</p>
+      <p class="src">↳ <b>{screen + nodeId}</b> · <b>{DESIGN.md rule / research line}</b>.</p></div></div>
+  </section>
+
+  <section>
+    <span class="k">Content &amp; copy</span>
+    <h2>The words</h2>
+    <div class="finding"><span class="sev p1">P1</span><div>
+      <p class="q">{Copy/voice/microcopy issue, as a question?}</p>
+      <p class="src">↳ <b>content.md</b> {line} · <b>DESIGN.md</b> {rule}.</p></div></div>
+  </section>
+
+  <section>
+    <span class="k">Analytics</span>
+    <h2>Is it measurable?</h2>
+    <div class="finding"><span class="sev p0">P0</span><div>
+      <p class="q">{Instrumentation gap — an event that won’t fire, as a question?}</p>
+      <p class="src">↳ <b>analytics.md</b> {line} · <b>PRD §{n}</b> success metric.</p></div></div>
+  </section>
+
+  <!-- Optional: keep only if research.md has relevant findings -->
+  <section>
+    <span class="k">Research alignment</span>
+    <h2>What users told us</h2>
+    <div class="finding"><span class="sev p1">P1</span><div>
+      <p class="q">{Does the design address this research finding?}</p>
+      <p class="src">↳ <b>research §{n}</b> “{quote}”.</p></div></div>
+  </section>
+
+  <!-- Optional: actionable prompts for redesigning in Figma -->
+  <section>
+    <span class="k">Figma Make prompts</span>
+    <h2>To take back into the canvas</h2>
+    <div class="prompt-card"><div class="label">P0 · {flow}</div><p>{An actionable prompt that includes product context + the specific gap + what to design.}</p></div>
+  </section>
+
+  <section>
+    <span class="k">For the design team</span>
+    <h2>Open questions</h2>
+    <ul class="q-list">
+      <li>{Question 1}</li>
+      <li>{Question 2}</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div class="foot">
+      <span class="mono">Generated by Superdesigner</span>
+      <span class="mono">· made with Claude Code dynamic workflows</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

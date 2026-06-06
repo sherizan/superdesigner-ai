@@ -104,7 +104,7 @@ single-file HTML prototype in `projects/<slug>/prototype/`. Force a path with `-
 ```
 You write                    Superdesigner generates
 ─────────────────────────    ─────────────────────────
-context/prd.md          →    insights/design-review.md      (review mode)
+context/prd.md          →    insights/design-review.html    (review mode)
 context/research.md     →    insights/design-comments.preview.md
 context/figma.md        →    insights/screen-plan.md        (scaffold mode, no Figma yet)
 context/content.md           prototype/*.html  or  Figma frames
@@ -159,7 +159,7 @@ reference for what "good" means; a per-project `context/DESIGN.md` overrides it.
 
 ## What You Get Back
 
-**design-review.md** — A structured review covering:
+**design-review.html** — A self-contained, branded review (open it in a browser; share it or pull it up in a crit) covering:
 - Missing states (empty, loading, error)
 - Edge cases you might have missed
 - Questions about unclear requirements

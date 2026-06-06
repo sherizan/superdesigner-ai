@@ -61,8 +61,8 @@ impact, weighted by the intent. Then write the two output files.
 
 ## Output (write exactly these two files)
 
-1. `projects/$1/insights/design-review.md` — follow the format in
-   `.superdesigner/templates/design-review.template.md`.
+1. `projects/$1/insights/design-review.html` — a self-contained, branded HTML report; follow
+   `.superdesigner/templates/design-review.template.html` (keep the `<style>`, fill in the content).
 
 2. `projects/$1/insights/design-comments.preview.md` — follow the EXACT format in
    `.superdesigner/templates/design-comments.template.md`. Limit to 10 comments. Each must have:

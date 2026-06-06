@@ -166,7 +166,7 @@ export async function run(args) {
   const projectPath = join(workspaceRoot, 'projects', slug);
   const insightsPath = join(projectPath, 'insights');
   const promptPath = join(insightsPath, 'prompts', '_review_prompt.md');
-  const designReviewPath = join(insightsPath, 'design-review.md');
+  const designReviewPath = join(insightsPath, 'design-review.html');
   const screenPlanPath = join(insightsPath, 'screen-plan.md');
   const prototypePath = join(projectPath, 'prototype');
 
@@ -253,11 +253,11 @@ export async function run(args) {
     console.log('✅ Review complete!');
     console.log('');
     console.log('📝 Next steps:');
-    console.log(`   1. View the design review in projects/${slug}/insights/`);
+    console.log(`   1. Open the review: projects/${slug}/insights/design-review.html`);
     console.log(`   2. Run: superdesigner comment ${slug} --dry-run`);
     console.log('');
   } else {
-    console.log(`⚠️  ${agentName} completed but design-review.md was not found.`);
+    console.log(`⚠️  ${agentName} completed but design-review.html was not found.`);
     console.log('   Try running again or check the prompt file manually.');
   }
   console.log('');

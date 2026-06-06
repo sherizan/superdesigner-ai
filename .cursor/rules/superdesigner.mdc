@@ -68,8 +68,11 @@ Figma inspection is still more rigorous than no review.
 
 Generate exactly two files:
 
-### 1. design-review.md
-**Follow the format in:** `.superdesigner/templates/design-review.template.md`
+### 1. design-review.html
+**Follow the template:** `.superdesigner/templates/design-review.template.html` — a self-contained,
+branded HTML report (this is the standard output). Copy it, keep the `<style>` intact, replace the
+`{tokens}` and the example finding rows with real content, and remove any section that doesn't apply.
+Every finding is framed as a question and carries its citation in `.src`.
 
 Key sections:
 - Executive Summary

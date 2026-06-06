@@ -124,8 +124,9 @@ intent above. Then write the two output files.
 
 ## Output (write exactly these two files)
 
-1. **projects/${slug}/insights/design-review.md** — Follow format in:
-   \`.superdesigner/templates/design-review.template.md\`
+1. **projects/${slug}/insights/design-review.html** — a self-contained, branded HTML report.
+   Follow \`.superdesigner/templates/design-review.template.html\`: copy it, keep the \`<style>\`
+   intact, replace the \`{tokens}\` and example finding rows with real content, drop any N/A section.
 
 2. **projects/${slug}/insights/design-comments.preview.md** — Follow the EXACT format in:
    \`.superdesigner/templates/design-comments.template.md\`
@@ -308,14 +309,14 @@ Call the **Workflow** tool with:
 - \`args\`: \`{ "slug": "${slug}", "projectName": "${projectName}", "intent": "${intentArg}" }\`
 
 It runs in the background; wait for it to complete. It returns an object:
-\`{ reviewMd, commentsBody, manifest, screens, counts }\`.
+\`{ reviewHtml, commentsBody, manifest, screens, counts }\`.
 
 ## Step 2 — write the artifacts from the returned object
 
 Using the returned values, write exactly these files (these are the only files you write):
 
-1. **projects/${slug}/insights/design-review.md** — the returned \`reviewMd\` verbatim (you may add a
-   \`**Date:**\` line under the title).
+1. **projects/${slug}/insights/design-review.html** — the returned \`reviewHtml\` verbatim (it is a
+   complete self-contained, branded HTML document — do not modify it).
 2. **projects/${slug}/insights/design-comments.preview.md** — a header then the returned
    \`commentsBody\` then a footer, in this shape:
    \`\`\`

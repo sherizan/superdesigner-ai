@@ -71,7 +71,7 @@ blank-canvas problem. It is not a polished-UI generator; the scaffold is a draft
    Superdesigner generates structured prompts and passes them to Cursor AI agents.
 
 4. **Artifacts over dashboards**  
-   The output is a design-review.md, not charts or scores.
+   The output is a design-review.html report, not charts or scores.
 
 ---
 
@@ -115,7 +115,7 @@ Validate one habit:
 - CLI-based workflow inside Cursor
 - Project-based folder structure
 - Single command to run a review
-- Output: `design-review.md`
+- Output: `design-review.html` (self-contained, branded report)
 - Optional posting of comments back to Figma
 - Scaffold mode: when there's a PRD but no Figma file, propose screens and build a starting point
   (Figma frames or an HTML prototype)

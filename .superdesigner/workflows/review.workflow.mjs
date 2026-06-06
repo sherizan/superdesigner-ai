@@ -12,9 +12,10 @@
  *     enforced by the schema's required `evidence` field, not by prose the model might ignore)
  *   - synthesis (dedup → intent-weighted rank → 10-comment cap) is plain JS, not model judgement
  *
- * It returns { reviewMd, commentsBody, manifest, screens, counts }. The caller writes the files
- * (workflow scripts have no filesystem access): design-review.md, design-comments.preview.md
- * (canonical format — parses through `superdesigner comment`), and run-manifest.json.
+ * It returns { reviewHtml, commentsBody, manifest, screens, counts }. The caller writes the files
+ * (workflow scripts have no filesystem access): design-review.html (a self-contained branded
+ * report), design-comments.preview.md (markdown — parses through `superdesigner comment`), and
+ * run-manifest.json.
  *
  * HOW TO RUN (today, opt-in): from a Claude Code session in this repo, invoke the Workflow tool with
  * this script's path and `args: { slug, projectName, intent }`. The returned strings get written to
@@ -161,42 +162,80 @@ const comments = deduped.slice(0, 10).map((f, i) => ({
   why: `[${f.severity}] ${f.evidence}`,
 }))
 
-// --- build the two markdown artifacts (date stamped by the caller) ---
+// --- build the branded, self-contained HTML report (the caller writes it verbatim) ---
 const bySev = (s) => deduped.filter(f => f.severity === s)
-const line = (f) => `- **${f.title}** _(${f.dimensions.join('+')})_ — ${f.evidence}${f.screen ? ` _(screen: ${f.screen}${f.nodeId ? `, ${f.nodeId}` : ''})_` : ''}`
-const reviewMd = `# Design Review: ${projectName}
+const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+const fRow = (f) => `      <div class="finding"><span class="sev ${f.severity.toLowerCase()}">${f.severity}</span><div>` +
+  `<p class="q">${esc(f.title)}</p>` +
+  `<p class="src">↳ ${esc(f.evidence)}${f.screen ? ` · <b>${esc(f.screen)}${f.nodeId ? ` (${esc(f.nodeId)})` : ''}</b>` : ''}</p></div></div>`
+const sevBlock = (s, label) => { const fs = bySev(s); return `      <h3>${label}</h3>\n${fs.length ? fs.map(fRow).join('\n') : '      <p class="src">None.</p>'}` }
+const dimBlock = (d) => { const fs = all.filter(f => f.dimension === d); if (!fs.length) return ''; return `  <section><span class="k">${d}</span><h2>${d}</h2>\n${fs.map(fRow).join('\n')}\n  </section>` }
+const figmaNote = figma && figma.figmaMcpConnected ? 'Live Figma inspection was used.' : 'Live Figma inspection was skipped (MCP not connected) — screen inventory taken from figma.md.'
 
-**Reviewer:** Superdesigner (dynamic-workflow orchestrator)
-**Intent:** ${intent}
-**Mode:** review
+const reviewHtml = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Review — ${esc(projectName)}</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2317130F'/%3E%3Crect x='6' y='19' width='20' height='6' rx='2' fill='%23E4FB52'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..600&family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F4EFE3;--ink:#17130F;--ink-2:#5b5246;--ink-3:#8a7f6f;--acid:#E4FB52;--redline:#E0503A;--p2:#1e8e3e;--line:#dcd2bd;--card:#FBF8F0;--serif:'Fraunces',Georgia,serif;--sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding:0 28px}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+header.mast{padding:56px 0 28px;border-bottom:2px solid var(--ink)}
+.brand{font-family:var(--serif);font-weight:600;font-size:18px}
+header.mast h1{font-family:var(--serif);font-weight:560;font-size:clamp(30px,5vw,50px);line-height:1.05;letter-spacing:-.02em;margin:20px 0 14px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 10px}
+.tag{font-family:var(--mono);font-size:11px;color:var(--ink-2);border:1px solid var(--line);background:var(--card);padding:5px 11px;border-radius:999px}
+.tag b{color:var(--ink)}
+section{padding:32px 0;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+.k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+h2{font-family:var(--serif);font-weight:560;font-size:clamp(22px,3vw,30px);letter-spacing:-.015em;margin:8px 0 16px}
+h3{font-family:var(--serif);font-weight:560;font-size:18px;margin:20px 0 8px}
+p.lead{font-size:18px;color:#2b2620}
+.finding{display:flex;gap:14px;padding:14px 0;border-bottom:1px dashed var(--line)}
+.finding:last-child{border-bottom:0}
+.sev{flex:none;height:fit-content;font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:6px}
+.sev.p0{background:var(--redline);color:#fff}.sev.p1{background:var(--acid);color:var(--ink)}.sev.p2{background:var(--p2);color:#fff}
+.q{font-family:var(--serif);font-size:18px;line-height:1.3;margin-bottom:6px}
+.src{font-family:var(--mono);font-size:11px;color:var(--ink-2);line-height:1.5}.src b{color:var(--ink)}
+footer{padding:28px 0 60px;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <span class="brand">✲ Superdesigner</span>
+    <h1>Design Review — ${esc(projectName)}</h1>
+    <div class="meta"><span class="tag">intent · <b>${esc(intent)}</b></span><span class="tag">mode · <b>review</b></span><span class="tag">orchestrator · <b>dynamic workflow</b></span><span class="tag">reviews intent, not pixels</span></div>
+  </header>
 
----
+  <section>
+    <span class="k">Executive summary</span>
+    <h2>The short version</h2>
+    <p class="lead">${deduped.length} findings across PRD, Figma, UX, Content, and Analytics after dedup — ${bySev('P0').length} are P0 (launch-blocking). ${figmaNote}</p>
+  </section>
 
-## Executive Summary
+  <section>
+    <span class="k">Recommendations · by priority</span>
+    <h2>What to fix, in order</h2>
+${sevBlock('P0', 'P0 — blocking')}
+${sevBlock('P1', 'P1 — high impact')}
+${sevBlock('P2', 'P2 — nice to have')}
+  </section>
 
-${deduped.length} findings across PRD, Figma, UX, Content, and Analytics after dedup. ${bySev('P0').length} are P0 (launch-blocking). Live Figma inspection was ${figma && figma.figmaMcpConnected ? 'used' : 'skipped (MCP not connected) — screen inventory taken from figma.md'}.
+${['PRD', 'Figma', 'UX', 'Content', 'Analytics'].map(dimBlock).filter(Boolean).join('\n')}
 
-## Recommendations Priority
-
-### P0 (Blocking Launch)
-${bySev('P0').map(line).join('\n') || '_None._'}
-
-### P1 (High Impact)
-${bySev('P1').map(line).join('\n') || '_None._'}
-
-### P2 (Nice to Have)
-${bySev('P2').map(line).join('\n') || '_None._'}
-
-## Findings by dimension
-
-${['PRD', 'Figma', 'UX', 'Content', 'Analytics'].map(d => {
-  const fs = all.filter(f => f.dimension === d)
-  return `### ${d} (${fs.length})\n${fs.map(f => `- ${f.title} — ${f.evidence}`).join('\n') || '_No findings._'}`
-}).join('\n\n')}
-
----
-*Generated by Superdesigner (dynamic workflow)*
-`
+  <footer><span class="mono">Generated by Superdesigner · made with Claude Code dynamic workflows</span></footer>
+</div>
+</body>
+</html>`
 
 const commentsBody = comments.map(c => `## Comment ${c.n}
 Target:
@@ -235,4 +274,4 @@ const manifest = {
   commentCapRationale: 'top 10 by intent-weighted severity (pre-launch boosts trust/error/analytics/edge), pinned to screen nodeIds where available',
 }
 
-return { reviewMd, commentsBody, manifest, screens, counts: { raw: all.length, deduped: deduped.length, comments: comments.length } }
+return { reviewHtml, commentsBody, manifest, screens, counts: { raw: all.length, deduped: deduped.length, comments: comments.length } }
