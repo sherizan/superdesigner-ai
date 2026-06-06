@@ -49,6 +49,14 @@
   .mark.red{animation-name:swipeRed} @keyframes swipeRed{to{background-size:100% 14%}}
 
   /* nav */
+  /* v2.0 announcement bar */
+  .announce{background:var(--ink); color:var(--paper); font-family:var(--mono); font-size:12px; letter-spacing:.02em}
+  .announce-in{display:flex; gap:8px 14px; align-items:center; justify-content:center; padding:9px 0; flex-wrap:wrap; text-align:center}
+  .announce .tagnew{background:var(--acid); color:var(--ink); font-weight:500; padding:2px 8px; border-radius:5px; letter-spacing:.08em}
+  .announce b{color:var(--acid); font-weight:500}
+  .announce a{color:var(--paper); text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--acid); white-space:nowrap}
+  .announce a:hover{color:var(--acid)}
+
   nav{position:sticky; top:0; z-index:50; background:color-mix(in srgb,var(--paper) 86%, transparent); backdrop-filter:blur(8px); border-bottom:1px solid var(--line)}
   .nav-in{display:flex; align-items:center; gap:18px; height:66px}
   .brand{display:flex; align-items:center; gap:10px; font-family:var(--serif); font-weight:600; font-size:21px; letter-spacing:-.01em}
@@ -214,6 +222,14 @@
 </style>
 </head>
 <body>
+
+<div class="announce">
+  <div class="wrap announce-in">
+    <span class="tagnew">v2.0</span>
+    <span>Rebuilt on <b>Claude Code dynamic workflows</b> — a ground-up upgrade from the Cursor-agent MVP.</span>
+    <a href="#flow">see what's new ↓</a>
+  </div>
+</div>
 
 <nav>
   <div class="wrap nav-in">
