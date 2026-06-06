@@ -135,6 +135,33 @@
   @media (max-width:860px){ .panel{grid-template-columns:repeat(2,1fr)} }
   @media (max-width:480px){ .panel{grid-template-columns:1fr} }
 
+  /* the flow — mirrors the architecture diagram, in the page palette */
+  .flow{max-width:880px; margin:0 auto}
+  .stage{background:var(--card); border:1px solid var(--line); border-radius:13px; padding:16px 24px; box-shadow:var(--shadow); text-align:center}
+  .stage.narrow{max-width:430px; margin:0 auto}
+  .stage .k{font-family:var(--mono); font-size:10.5px; color:var(--ink-3); letter-spacing:.14em; text-transform:uppercase}
+  .stage h4{font-family:var(--serif); font-weight:560; font-size:21px; margin:6px 0 3px; letter-spacing:-.01em}
+  .stage p{font-size:13px; color:var(--ink-2); line-height:1.5}
+  .stage .sub{font-family:var(--mono); font-size:11px; color:var(--ink-2); margin-top:7px; letter-spacing:.02em}
+  .stage.accent{background:var(--ink); border-color:var(--ink)}
+  .stage.accent .k{color:var(--acid)} .stage.accent h4{color:var(--paper)} .stage.accent p{color:rgba(244,239,227,.82)}
+  .stage.accent .badge{display:inline-flex; align-items:center; gap:7px; margin-top:12px; font-family:var(--mono); font-size:11px; color:var(--ink); background:var(--acid); padding:6px 12px; border-radius:999px}
+  .stage.guard{border-color:var(--redline); border-width:1.5px}
+  .stage.guard .k{color:var(--redline)}
+  .frow{display:grid; gap:10px}
+  .frow.f5{grid-template-columns:repeat(5,1fr)}
+  .frow.f2{grid-template-columns:1fr 1fr}
+  .cell{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 12px; text-align:center; box-shadow:var(--shadow)}
+  .cell .k{font-family:var(--mono); font-size:10px; color:var(--ink-3); letter-spacing:.1em; text-transform:uppercase}
+  .cell h5{font-family:var(--serif); font-weight:600; font-size:17px; margin:5px 0 4px; letter-spacing:-.01em}
+  .cell p{font-size:11.5px; color:var(--ink-2); line-height:1.42}
+  .cell.ink{background:var(--ink); border-color:var(--ink)}
+  .cell.ink .k{color:var(--acid)} .cell.ink h5{color:var(--paper)} .cell.ink p{color:rgba(244,239,227,.74)}
+  .connector{width:2px; height:24px; margin:0 auto; background:var(--ink); opacity:.22; position:relative}
+  .connector::after{content:"▾"; position:absolute; left:50%; bottom:-5px; transform:translateX(-50%); color:var(--ink); opacity:.55; font-size:11px}
+  @media (max-width:720px){ .frow.f5{grid-template-columns:repeat(2,1fr)} .frow.f2{grid-template-columns:1fr} }
+  @media (max-width:440px){ .frow.f5{grid-template-columns:1fr} }
+
   /* how it works */
   .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; counter-reset:s}
   .step{position:relative; padding-top:18px; border-top:2px solid var(--ink)}
@@ -293,10 +320,87 @@
   </div>
 </section>
 
+<section id="flow">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="num mono">03 / the flow</span>
+      <div>
+        <h2>From context to comments, end to end</h2>
+        <p class="sec-sub">Made with <b style="color:var(--ink)">dynamic workflows in Claude Code</b> — a script orchestrates the run, so the parallel fan-out, the dependencies, and the synthesis are guaranteed, not left to chance.</p>
+      </div>
+    </div>
+
+    <div class="flow reveal">
+      <div class="stage narrow">
+        <span class="k">context</span>
+        <h4>You drop in the context</h4>
+        <div class="sub">Figma · PRD · research · analytics · copy brief · DESIGN.md</div>
+      </div>
+      <div class="connector"></div>
+
+      <div class="stage narrow">
+        <span class="k">intent parser</span>
+        <h4>What kind of review is this?</h4>
+        <div class="sub">pre-handoff · pre-launch · gap-audit</div>
+      </div>
+      <div class="connector"></div>
+
+      <div class="stage narrow accent">
+        <span class="k">orchestrator</span>
+        <h4>Dynamic workflow</h4>
+        <p>Plans which agents run, and in what order.</p>
+        <span class="badge">✲ made with Claude Code dynamic workflows</span>
+      </div>
+      <div class="connector"></div>
+
+      <div class="frow f5">
+        <div class="cell"><span class="k">agent</span><h5>PRD</h5><p>requirements → screens</p></div>
+        <div class="cell"><span class="k">agent</span><h5>Figma</h5><p>screen structure</p></div>
+        <div class="cell"><span class="k">agent</span><h5>UX</h5><p>states &amp; flow</p></div>
+        <div class="cell"><span class="k">agent</span><h5>Content</h5><p>copy &amp; voice</p></div>
+        <div class="cell"><span class="k">agent</span><h5>Analytics</h5><p>measurability</p></div>
+      </div>
+      <div class="connector"></div>
+
+      <div class="frow f2">
+        <div class="cell"><span class="k">tool registry</span><h5>Scoped tools</h5><p>Figma MCP · DESIGN.md · per-agent access</p></div>
+        <div class="cell"><span class="k">memory layer</span><h5>What carries over</h5><p>session · project · your preferences</p></div>
+      </div>
+      <div class="connector"></div>
+
+      <div class="stage narrow">
+        <span class="k">synthesis</span>
+        <h4>Rank, merge, prioritise</h4>
+        <div class="sub">dedupe · attach evidence · rank by impact · cap to 10</div>
+      </div>
+      <div class="connector"></div>
+
+      <div class="stage narrow guard">
+        <span class="k">guardrails</span>
+        <h4>Evidence or it doesn’t ship</h4>
+        <div class="sub">every finding cites a source · no taste as fact · questions, not verdicts</div>
+      </div>
+      <div class="connector"></div>
+
+      <div class="frow f2">
+        <div class="cell ink"><span class="k">output</span><h5>design-review.md</h5><p>structured review — gaps, questions, priorities</p></div>
+        <div class="cell ink"><span class="k">output</span><h5>Figma comments</h5><p>max 10 · ready to post · one idea each</p></div>
+      </div>
+      <div class="connector"></div>
+
+      <div class="stage narrow">
+        <span class="k">observability</span>
+        <h4>An auditable trail</h4>
+        <div class="sub">what ran · what was skipped · what the designer overrode</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="how">
   <div class="wrap">
     <div class="sec-head reveal">
-      <span class="num mono">03 / how it works</span>
+      <span class="num mono">04 / how it works</span>
       <div><h2>Three steps. About a minute of your attention.</h2></div>
     </div>
     <div class="steps">
@@ -319,7 +423,7 @@
 <section id="proof">
   <div class="wrap reveal">
     <div class="sec-head">
-      <span class="num mono">04 / what lands on your desk</span>
+      <span class="num mono">05 / what lands on your desk</span>
       <div><h2>A review you’d be proud to have written</h2></div>
     </div>
     <div class="proof">
@@ -355,8 +459,8 @@
   <div class="wrap reveal">
     <div class="ticker" aria-label="What makes Superdesigner different">
       <div class="run">
-        <span>reviews intent, not pixels</span><span>evidence or it doesn’t ship</span><span>max 10 comments — signal, not noise</span><span>questions, not verdicts</span><span>runs on Claude Code</span>
-        <span aria-hidden="true">reviews intent, not pixels</span><span aria-hidden="true">evidence or it doesn’t ship</span><span aria-hidden="true">max 10 comments — signal, not noise</span><span aria-hidden="true">questions, not verdicts</span><span aria-hidden="true">runs on Claude Code</span>
+        <span>reviews intent, not pixels</span><span>evidence or it doesn’t ship</span><span>max 10 comments — signal, not noise</span><span>questions, not verdicts</span><span>made with Claude Code dynamic workflows</span>
+        <span aria-hidden="true">reviews intent, not pixels</span><span aria-hidden="true">evidence or it doesn’t ship</span><span aria-hidden="true">max 10 comments — signal, not noise</span><span aria-hidden="true">questions, not verdicts</span><span aria-hidden="true">made with Claude Code dynamic workflows</span>
       </div>
     </div>
   </div>
@@ -378,7 +482,7 @@
   <div class="wrap foot">
     <a class="brand" href="#top" style="text-decoration:none;font-size:18px"><span class="dot" style="width:22px;height:22px;font-size:13px"><em>S</em></span>Superdesigner</a>
     <span class="nav-spacer"></span>
-    <span class="mono">reviews intent, not pixels</span>
+    <span class="mono">made with Claude Code dynamic workflows</span>
     <a href="https://github.com/sherizan/superdesigner-ai">GitHub</a>
     <span class="mono">superdesigner.ai</span>
   </div>
