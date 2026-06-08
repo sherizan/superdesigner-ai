@@ -158,6 +158,7 @@
   .stage.guard .k{color:var(--redline)}
   .frow{display:grid; gap:10px}
   .frow.f5{grid-template-columns:repeat(5,1fr)}
+  .frow.f3{grid-template-columns:repeat(3,1fr)}
   .frow.f2{grid-template-columns:1fr 1fr}
   .cell{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 12px; text-align:center; box-shadow:var(--shadow)}
   .cell .k{font-family:var(--mono); font-size:10px; color:var(--ink-3); letter-spacing:.1em; text-transform:uppercase}
@@ -167,7 +168,7 @@
   .cell.ink .k{color:var(--acid)} .cell.ink h5{color:var(--paper)} .cell.ink p{color:rgba(244,239,227,.74)}
   .connector{width:2px; height:24px; margin:0 auto; background:var(--ink); opacity:.22; position:relative}
   .connector::after{content:"▾"; position:absolute; left:50%; bottom:-5px; transform:translateX(-50%); color:var(--ink); opacity:.55; font-size:11px}
-  @media (max-width:720px){ .frow.f5{grid-template-columns:repeat(2,1fr)} .frow.f2{grid-template-columns:1fr} }
+  @media (max-width:720px){ .frow.f5{grid-template-columns:repeat(2,1fr)} .frow.f3{grid-template-columns:1fr} .frow.f2{grid-template-columns:1fr} }
   @media (max-width:440px){ .frow.f5{grid-template-columns:1fr} }
 
   /* how it works */
@@ -398,9 +399,10 @@
       </div>
       <div class="connector"></div>
 
-      <div class="frow f2">
+      <div class="frow f3">
         <div class="cell ink"><span class="k">output</span><h5>design-review.html</h5><p>a self-contained, branded report</p></div>
         <div class="cell ink"><span class="k">output</span><h5>Figma comments</h5><p>max 10 · ready to post · one idea each</p></div>
+        <div class="cell ink"><span class="k">new</span><h5>Figma Make prompts</h5><p>one click from a gap into the canvas</p></div>
       </div>
       <div class="connector"></div>
 
@@ -430,7 +432,7 @@
       </div>
       <div class="step reveal" style="transition-delay:.16s">
         <h4>Walk in prepared</h4>
-        <p>You get a cited <code>design-review.html</code> and up to ten ready-to-post Figma comments — ranked by impact, one idea each.</p>
+        <p>You get a cited <code>design-review.html</code>, up to ten ready-to-post Figma comments, and redesign prompts that open straight in <b>Figma Make</b> — one click from a gap into the canvas.</p>
       </div>
     </div>
   </div>
@@ -467,6 +469,10 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="cta-row reveal" style="margin-top:28px">
+      <a class="btn" href="sample-review.html">Open the full sample report ↗</a>
+      <span class="cta-note">real output · the Figma Make prompts are one-click deep links into the canvas</span>
     </div>
   </div>
 </section>
