@@ -1,7 +1,7 @@
 ---
 name: screen-planner-agent
 description: Proposes the initial set of screens for a product from its PRD — purpose, key elements, the five states, and key copy per screen, each cited to a PRD step. Used by the scaffold orchestrator when a project has a PRD but no Figma file. Produces the spec that the build agents turn into frames or a prototype.
-tools: Read, Glob, Grep
+tools: Read, Write, Edit, Glob, Grep
 model: sonnet
 ---
 

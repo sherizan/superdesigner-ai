@@ -152,7 +152,10 @@ deduped.sort((a, b) => weight(a) - weight(b))
 for (const f of deduped) if (!f.nodeId) f.nodeId = nodeFor(f.screen) || nodeFor(f.title)
 
 // 10-comment cap — prefer pinned/actionable findings, keep rank order
-const comments = deduped.slice(0, 10).map((f, i) => ({
+const CAP = 10
+const kept = deduped.slice(0, CAP)
+const dropped = deduped.slice(CAP) // ranked below the cut line — surfaced in the provenance strip + manifest, not as comments
+const comments = kept.map((f, i) => ({
   n: i + 1,
   page: f.screen || projectName,
   frame: null,
@@ -171,6 +174,32 @@ const fRow = (f) => `      <div class="finding"><span class="sev ${f.severity.to
 const sevBlock = (s, label) => { const fs = bySev(s); return `      <h3>${label}</h3>\n${fs.length ? fs.map(fRow).join('\n') : '      <p class="src">None.</p>'}` }
 const dimBlock = (d) => { const fs = all.filter(f => f.dimension === d); if (!fs.length) return ''; return `  <section><span class="k">${d}</span><h2>${d}</h2>\n${fs.map(fRow).join('\n')}\n  </section>` }
 const figmaNote = figma && figma.figmaMcpConnected ? 'Live Figma inspection was used.' : 'Live Figma inspection was skipped (MCP not connected) — screen inventory taken from figma.md.'
+
+// --- provenance strip: show the work behind the findings (coverage · grounding · funnel · what got cut) ---
+const figmaLive = !!(figma && figma.figmaMcpConnected)
+const agentMeta = [
+  { name: 'PRD', ran: !!prd, findings: prd ? prd.findings.length : 0 },
+  { name: 'Figma', ran: !!figma, findings: figma && figma.findings ? figma.findings.length : 0 },
+  { name: 'UX', ran: !!ux, findings: ux ? ux.findings.length : 0 },
+  { name: 'Content', ran: !!content, findings: content ? content.findings.length : 0 },
+  { name: 'Analytics', ran: !!analytics, findings: analytics ? analytics.findings.length : 0 },
+]
+const agentsRan = agentMeta.filter(a => a.ran).length
+const provSummary = `${agentsRan}/${agentMeta.length} agents · ${screens.length} screens · ${all.length}→${deduped.length}→${comments.length} findings${dropped.length ? ` · ${dropped.length} below the cut` : ''}`
+const provChips = agentMeta.map(a =>
+  `<span class="chip ${a.ran ? 'on' : 'off'}">${a.ran ? '●' : '○'} ${a.name} · ${a.ran ? a.findings : 'skipped'}</span>`).join('')
+const provCut = dropped.length
+  ? `<p class="prov-funnel">${dropped.length} finding${dropped.length === 1 ? '' : 's'} ranked below the ${CAP}-comment cut line — real, but not posted:</p>\n      <ul class="prov-cut">${dropped.map(f => `<li><span class="sev ${f.severity.toLowerCase()}">${f.severity}</span> ${esc(f.title)}</li>`).join('')}</ul>`
+  : `<p class="prov-funnel">Nothing was cut — every finding after dedup is in the report.</p>`
+const provenanceStrip = `    <details class="prov">
+      <summary><span class="k">How this review was made</span><span class="prov-sum">${provSummary}</span></summary>
+      <div class="prov-body">
+        <div class="prov-grid">${provChips}</div>
+        <p class="prov-note ${figmaLive ? '' : 'warn'}">${figmaLive ? '✓ Live Figma inspection (MCP connected) — findings pinned to verified screen node IDs.' : '⚠ Figma MCP not connected — screen inventory read from figma.md; node IDs are best-effort, not verified live.'}</p>
+        <p class="prov-funnel"><b>${all.length}</b> raw findings → <b>${deduped.length}</b> after dedup → <b>${comments.length}</b> shown.</p>
+        ${provCut}
+      </div>
+    </details>`
 
 // --- Figma Make prompts: top P0/P1 findings → actionable redesign prompts (the in-browser script turns each into a deep link) ---
 const makeFigmaPrompt = (f) => {
@@ -219,6 +248,22 @@ p.lead{font-size:18px;color:#2b2620}
 .sev.p0{background:var(--redline);color:#fff}.sev.p1{background:var(--acid);color:var(--ink)}.sev.p2{background:var(--p2);color:#fff}
 .q{font-family:var(--serif);font-size:18px;line-height:1.3;margin-bottom:6px}
 .src{font-family:var(--mono);font-size:11px;color:var(--ink-2);line-height:1.5}.src b{color:var(--ink)}
+details.prov{margin-top:18px;border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden}
+details.prov>summary{list-style:none;cursor:pointer;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+details.prov>summary::-webkit-details-marker{display:none}
+details.prov>summary::before{content:'▸';color:var(--ink-3);font-size:11px}
+details.prov[open]>summary::before{content:'▾'}
+.prov-sum{font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+.prov-body{padding:14px 16px 16px;border-top:1px solid var(--line)}
+.prov-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.chip{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
+.chip.on{color:var(--ink);background:var(--paper)}
+.chip.off{color:var(--ink-3);opacity:.65}
+.prov-note{font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--ink-2);padding:8px 11px;border-radius:8px;background:var(--paper);margin:8px 0}
+.prov-note.warn{color:#7a4a12;background:#fbf1d8;border:1px solid #ecd9a8}
+.prov-funnel{font-size:13.5px;color:var(--ink-2);margin:10px 0 4px}.prov-funnel b{color:var(--ink)}
+.prov-cut{list-style:none;margin-top:8px;display:flex;flex-direction:column;gap:7px}
+.prov-cut li{display:flex;gap:10px;align-items:baseline;font-size:13.5px;color:var(--ink-2)}
 .prompt-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:10px 0}
 .prompt-card .label{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.1em}
 .prompt-card p{font-size:14.5px;margin-top:6px}
@@ -243,6 +288,7 @@ footer{padding:28px 0 60px;color:var(--ink-3)}
     <span class="k">Executive summary</span>
     <h2>The short version</h2>
     <p class="lead">${deduped.length} findings across PRD, Figma, UX, Content, and Analytics after dedup — ${bySev('P0').length} are P0 (launch-blocking). ${figmaNote}</p>
+${provenanceStrip}
   </section>
 
   <section>
@@ -325,7 +371,16 @@ const manifest = {
   findingsRaw: all.length,
   findingsDeduped: deduped.length,
   commentsSelected: comments.length,
-  commentCapRationale: 'top 10 by intent-weighted severity (pre-launch boosts trust/error/analytics/edge), pinned to screen nodeIds where available',
+  findingsDropped: dropped.length,
+  // findings that survived dedup but ranked below the 10-comment cut — kept here so the report can disclose them and the next run can avoid re-deriving the same tail
+  dropped: dropped.map(f => ({
+    title: f.title,
+    severity: f.severity,
+    type: f.type,
+    dimensions: f.dimensions || [f.dimension],
+    evidence: f.evidence,
+  })),
+  commentCapRationale: `top ${CAP} by intent-weighted severity (pre-launch boosts trust/error/analytics/edge), pinned to screen nodeIds where available`,
 }
 
 return { reviewHtml, commentsBody, manifest, screens, counts: { raw: all.length, deduped: deduped.length, comments: comments.length } }
