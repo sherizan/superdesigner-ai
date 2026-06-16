@@ -1,0 +1,13 @@
+{
+  "name": "superdesigner",
+  "version": "0.1.0",
+  "description": "AI design review for Claude Code — connects PRD, research, Figma, and analytics to review design intent (not pixels) and surface gaps before handoff or launch. Run /review <project>.",
+  "author": {
+    "name": "Sherizan Sheikh",
+    "url": "https://github.com/sherizan"
+  },
+  "homepage": "https://designagent.dev/plugins/superdesigner",
+  "repository": "https://github.com/sherizan/superdesigner-ai",
+  "license": "MIT",
+  "keywords": ["design-review", "ux", "critique", "qa", "figma", "prd"]
+}
