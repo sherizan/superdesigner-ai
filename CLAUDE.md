@@ -1,40 +1,31 @@
-# Superdesigner (Claude Code)
+# superdesigner-ai
 
-Superdesigner reasons about intent, not pixels. It connects a PRD, research, a Figma file, and
-analytics, then surfaces the gaps before review, handoff, or launch. When there's a PRD but no
-Figma file yet, it flips to **scaffold mode** — proposing screens from the PRD and building a
-first-draft starting point (Figma frames or an HTML prototype) to solve the blank-canvas problem.
+This repo hosts the **[superdesigner.ai](https://superdesigner.ai) landing site** (`site/` — a single
+self-contained HTML page, deploys on Cloudflare Pages) and the **sample DesignReview projects**
+(`projects/`). `DESIGN.md` is the review rubric the samples cite.
 
-This project runs on **Claude Code**. Cursor stays the editor and filesystem; Claude Code is
-the agent that does the review. The two pair: edit in Cursor, review with Claude Code.
+## The plugin lives elsewhere
 
-## Review rules (single source of truth)
+DesignReview's plugin — `/new`, `/review`, `/annotate`, the review agents, the `design-review` skill,
+and the templates — now lives in the **`sherizan/designagent-figma`** repo under `designreview/`, and
+is published as **`designreview`** in the DesignAgent marketplace. It reads and annotates Figma
+through the DesignAgent bridge, so the two ship together.
 
-@.cursor/rules/superdesigner.mdc
+To run reviews on the sample projects here, install both from that marketplace and open the file with
+the DesignAgent Figma plugin (bridge enabled):
 
-The rules above govern every review: review intent not pixels, the five states per screen, the
-edge cases, the file contract (read context, write only to `insights/`), the ten-comment cap, and
-the rule that every finding cites its source or it does not ship. Follow them exactly.
+```
+/plugin marketplace add sherizan/designagent
+/plugin install designagent@designagent
+/plugin install designreview@designagent
+```
 
-## Figma MCP (optional, recommended)
+Then `/review <slug>` against a project in `projects/`.
 
-Reviews use the official **Figma Dev Mode MCP**, configured in `.mcp.json` (server name `figma`).
-Tools: `mcp__figma__get_metadata` and `mcp__figma__get_design_context`. Start the Figma desktop
-app with Dev Mode MCP enabled before a review to pin comments to verified screen-level node IDs.
-It is not required: if the MCP is not connected, the review still runs against `figma.md` and the
-other context, takes comment node IDs from `figma.md`, and notes that live Figma inspection was
-skipped.
+## Scope of this repo
 
-## Run a review (or scaffold)
+- `site/` — the landing page + a live sample report. Edit here for superdesigner.ai.
+- `projects/` — sample projects (context, insights, prototypes) used to demo and dogfood the plugin.
+- `DESIGN.md` — the review rubric ("what good means").
 
-- **Interactive:** open this repo in Claude Code and run `/review <project-slug>`.
-- **Headless:** `superdesigner review <project-slug>` runs the review via `claude -p` (add `--no-agent` to just prepare the prompt).
-
-The command picks the mode from `figma.md`:
-
-- **Review** (a Figma link is present): outputs `projects/<slug>/insights/design-review.html` (a
-  self-contained, branded report) and `design-comments.preview.md` (markdown, parsed by
-  `comment`). Then `superdesigner comment <slug>` posts the comments to Figma.
-- **Scaffold** (a PRD but no Figma link): outputs `insights/screen-plan.md` plus either starter
-  frames in the open Figma file or an HTML prototype in `projects/<slug>/prototype/`. Force a path
-  with `--scaffold figma|code` (omit to let the agent choose/ask).
+Do not add plugin/agent code here — it belongs in `designagent-figma/designreview/`.

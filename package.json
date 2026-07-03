@@ -1,31 +1,15 @@
 {
-  "name": "superdesigner",
+  "name": "superdesigner-ai",
   "version": "0.1.0",
-  "description": "Design review, before design review happens.",
-  "type": "module",
-  "bin": {
-    "superdesigner": "./.superdesigner/bin/superdesigner.js"
-  },
-  "files": [
-    ".superdesigner/"
-  ],
-  "engines": {
-    "node": ">=18"
-  },
-  "scripts": {
-    "init": "node ./.superdesigner/bin/superdesigner.js init",
-    "new": "node ./.superdesigner/bin/superdesigner.js init",
-    "review": "node ./.superdesigner/bin/superdesigner.js review",
-    "comment": "node ./.superdesigner/bin/superdesigner.js comment",
-    "doctor": "node ./.superdesigner/bin/superdesigner.js doctor"
-  },
+  "description": "Landing site (superdesigner.ai) and sample projects for DesignReview. The plugin lives in sherizan/designagent-figma (designreview).",
+  "private": true,
   "keywords": [
     "design",
     "review",
     "figma",
     "claude-code",
     "claude",
-    "cursor",
+    "designagent",
     "ai"
   ],
   "repository": {
