@@ -1,6 +1,6 @@
 # superdesigner-ai
 
-This repo hosts the **[superdesigner.ai](https://superdesigner.ai) landing site** (`site/` — a single
+This repo hosts the **[superdesigner.ai](https://superdesigner.ai) hub page** for the Superdesigner network — DesignAgent, Prototo, Design AI Stack (`site/` — a single
 self-contained HTML page, deploys on Cloudflare Pages) and the **sample DesignReview projects**
 (`projects/`). `DESIGN.md` is the review rubric the samples cite.
 
