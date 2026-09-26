@@ -1,14 +1,14 @@
-# superdesigner.ai — moved notice
+# superdesigner.ai — network hub
 
-DesignReview is now a Claude Code plugin in the **DesignAgent** marketplace. This domain serves a
-single static page saying it's moved, with a link to [designagent.dev](https://designagent.dev/).
+Superdesigner is the parent brand for Sherizan's projects. This domain serves a single static
+page linking to each one:
 
-- `index.html` — the notice page ("superdesigner.ai is now part of designagent.dev" + link). No
-  auto-redirect, so visitors see the message and click through. `<link rel="canonical">` points at
-  designagent.dev for search.
+- [designagent.dev](https://designagent.dev/) — Claude Code plugins, built for designers.
+- [prototo.app](https://prototo.app/) — Prototypes that run on real iPhones.
+- [designaistack.com](https://designaistack.com/) — The full-stack playbook for designers using AI.
 
-To turn it back into a hard 301 redirect instead, add a `_redirects` file
-(`/*  https://designagent.dev/  301`).
+`index.html` is self-contained (no build, no JS). To add a project, copy one `<li>` in the
+`.network` list and set its `--hue` to the project's brand color.
 
 ## Deploy on Cloudflare Pages
 

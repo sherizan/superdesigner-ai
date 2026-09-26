@@ -3,27 +3,154 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>superdesigner.ai is now part of designagent.dev</title>
-<link rel="canonical" href="https://designagent.dev/">
+<title>Superdesigner — a network by Sherizan</title>
+<meta name="description" content="Superdesigner is Sherizan's network of tools and playbooks for designers who build with AI: DesignAgent, Prototo and Design AI Stack.">
+<meta property="og:title" content="Superdesigner — a network by Sherizan">
+<meta property="og:description" content="Tools and playbooks for designers who build with AI: DesignAgent, Prototo and Design AI Stack.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://superdesigner.ai/">
+<link rel="canonical" href="https://superdesigner.ai/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23080808'/%3E%3Ctext x='16' y='22' font-family='system-ui,sans-serif' font-size='18' font-weight='600' fill='%23f2f2f2' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: light dark; }
-  * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center;
-         font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-         background: #faf8f3; color: #1a1a17; padding: 24px; }
-  @media (prefers-color-scheme: dark) { body { background: #0e0e0d; color: #f2f2ee; } }
-  main { max-width: 32rem; text-align: center; }
-  h1 { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 700; line-height: 1.25; margin: 0 0 1.5rem; }
-  a { color: inherit; }
-  h1 a { text-decoration-thickness: 2px; text-underline-offset: 3px; }
-  .cta { display: inline-block; margin-top: .25rem; padding: .7rem 1.25rem; border-radius: 10px;
-         border: 1px solid currentColor; font-weight: 600; text-decoration: none; }
+  :root {
+    --bg: #080808;
+    --fg: #f2f2f2;
+    --muted: #9a9a9a;
+    --line: rgba(255,255,255,.1);
+    --tile: #101010;
+    --gutter: clamp(16px, 4vw, 48px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { color-scheme: dark; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font: 400 17px/1.5 "Geist", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh; display: flex; flex-direction: column;
+    padding: 0 var(--gutter);
+  }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; border-radius: 4px; }
+
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 0; border-bottom: 1px solid var(--line);
+  }
+  .wordmark { font-weight: 600; font-size: 19px; letter-spacing: -.01em; }
+  #orb { width: 40px; height: 40px; }
+
+  main { flex: 1; }
+  h1 {
+    font-weight: 500; letter-spacing: -.035em; line-height: .98;
+    font-size: clamp(44px, 8.4vw, 124px);
+    max-width: 12ch; text-wrap: balance;
+    padding: clamp(64px, 12vh, 160px) 0 clamp(56px, 10vh, 128px);
+  }
+
+  .network {
+    list-style: none;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    padding-bottom: 28px;
+  }
+  @media (max-width: 900px) { .network { grid-template-columns: 1fr; } .network a { min-height: 240px; gap: 48px; } }
+  .network a {
+    position: relative; isolation: isolate; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 72px;
+    min-height: 360px; padding: 28px;
+    background: var(--tile); border: 1px solid var(--line); border-radius: 20px;
+    transition: border-color .25s;
+  }
+  /* each project brings its own light; Superdesigner itself stays black and white */
+  .network a::after {
+    content: ""; position: absolute; z-index: -1; inset: auto -20% -55% -20%; height: 90%;
+    background: radial-gradient(closest-side, var(--hue), transparent);
+    opacity: .28; filter: blur(24px);
+    transition: opacity .45s, transform .45s;
+  }
+  .network a:hover, .network a:focus-visible { border-color: rgba(255,255,255,.28); }
+  .network a:hover::after, .network a:focus-visible::after { opacity: .6; transform: translateY(-8%); }
+  .network h2 { font-weight: 500; font-size: 30px; letter-spacing: -.02em; line-height: 1.1; }
+  .network p { font-size: 17px; line-height: 1.45; max-width: 26ch; margin-top: 10px; }
+  .network small { display: block; font-size: 15px; color: var(--muted); }
+
+  footer {
+    display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap;
+    padding: 28px 0; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 15px;
+  }
+  footer a { text-decoration: underline; text-underline-offset: 3px; }
+  footer a:hover { color: var(--fg); }
+
+  @media (prefers-reduced-motion: reduce) { .network a, .network a::after { transition: none; } }
 </style>
 </head>
 <body>
+<header>
+  <a class="wordmark" href="/">Superdesigner</a>
+  <canvas id="orb" width="40" height="40" role="img" aria-label="Superdesigner"></canvas>
+</header>
+
 <main>
-  <h1>superdesigner.ai is now part of <a href="https://designagent.dev/">designagent.dev</a></h1>
-  <a class="cta" href="https://designagent.dev/">Visit designagent.dev →</a>
+  <h1>Tools and playbooks for designers who build with AI.</h1>
+
+  <ul class="network">
+    <li>
+      <a href="https://designagent.dev/" target="_blank" rel="noopener" style="--hue:#7a6cff">
+        <div><h2>DesignAgent</h2><p>Claude Code plugins, built for designers.</p></div>
+        <small>designagent.dev</small>
+      </a>
+    </li>
+    <li>
+      <a href="https://prototo.app/" target="_blank" rel="noopener" style="--hue:#3aa6ff">
+        <div><h2>Prototo</h2><p>Prototypes that run on real iPhones.</p></div>
+        <small>prototo.app</small>
+      </a>
+    </li>
+    <li>
+      <a href="https://designaistack.com/" target="_blank" rel="noopener" style="--hue:#ff6719">
+        <div><h2>Design AI Stack</h2><p>The full-stack playbook for designers using AI to grow, build and lead.</p></div>
+        <small>designaistack.com</small>
+      </a>
+    </li>
+  </ul>
 </main>
+
+<footer>
+  <span>© 2026 Superdesigner. <a href="https://sherizan.com/" target="_blank" rel="noopener">Made by Sherizan</a>.</span>
+</footer>
+
+<script>
+  // Shaping orb: a dotted outline that holds, then morphs circle → triangle → square, on loop.
+  (() => {
+    const c = document.getElementById('orb'), S = 40, dpr = Math.min(2, devicePixelRatio || 1);
+    c.width = c.height = S * dpr;
+    const ctx = c.getContext('2d');
+    const M = 144, N = 24, HOLD = 1.4, MORPH = 0.9, SEG = HOLD + MORPH, R = 0.4 * S;
+    // each shape: M points sampled evenly by arc length, starting at the top
+    const poly = v => { const L = v.map((a, i) => Math.hypot(...[0, 1].map(k => v[(i + 1) % v.length][k] - a[k])));
+      const T = L.reduce((a, b) => a + b), out = []; let seg = 0, acc = 0;
+      for (let i = 0; i < M; i++) { const d = i / M * T; while (acc + L[seg] < d) acc += L[seg++];
+        const a = v[seg], b = v[(seg + 1) % v.length], f = (d - acc) / L[seg];
+        out.push([a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f]); } return out; };
+    const circle = Array.from({ length: M }, (_, i) => { const a = -Math.PI / 2 + i / M * 2 * Math.PI; return [Math.cos(a), Math.sin(a)]; });
+    const tri = poly([0, 1, 2].map(i => { const a = -Math.PI / 2 + i * 2 * Math.PI / 3; return [Math.cos(a), Math.sin(a)]; }));
+    const sq = poly([[0, -.75], [.75, -.75], [.75, .75], [-.75, .75], [-.75, -.75]]); // start top-centre like the circle
+    const shapes = [circle, tri, sq];
+    const ease = x => x * x * (3 - 2 * x);
+    const draw = t => {
+      const k = Math.floor(t / SEG) % 3, local = t % SEG, m = local > HOLD ? ease((local - HOLD) / MORPH) : 0;
+      const A = shapes[k], B = shapes[(k + 1) % 3], pulse = 1 + .02 * Math.sin(local * 3.1);
+      const P = A.map((a, i) => [a[0] + (B[i][0] - a[0]) * m, a[1] + (B[i][1] - a[1]) * m]);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, S, S); ctx.fillStyle = '#f2f2f2';
+      for (let i = 0; i < N; i++) { const [x, y] = P[Math.round(i / N * M) % M];
+        ctx.beginPath(); ctx.arc(S / 2 + x * R * pulse, S / 2 + y * R * pulse, 0.035 * S, 0, 2 * Math.PI); ctx.fill(); }
+    };
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) draw(0);
+    else (function loop() { draw(performance.now() / 1e3 * 2.4); requestAnimationFrame(loop); })();
+  })();
+</script>
 </body>
 </html>
